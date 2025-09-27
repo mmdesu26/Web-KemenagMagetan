@@ -16,7 +16,7 @@ const Footer = () => {
 	const socialLinks = [
 		{ icon: <FaFacebook />, url: "https://facebook.com/kemenagmagetan" },
 		{ icon: <FaInstagram />, url: "https://instagram.com/kemenagmagetan" },
-		{ icon: <FaYoutube />, url: "https://youtube.com/kemenagmagetan" },
+		{ icon: <FaYoutube />, url: "https://youtube.com/@humaskemenagmagetan1932" },
 		{ icon: <FaTiktok />, url: "https://tiktok.com/@kemenagmagetan" },
 	];
 
