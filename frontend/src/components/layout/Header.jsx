@@ -366,7 +366,7 @@ const Header = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center">
-            <img src="/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
+            <img src="/assets/images/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
             <div>
               <h1 className="text-lg font-bold text-green-800">KEMENTERIAN AGAMA</h1>
               <p className="text-sm text-gray-600">Kabupaten Magetan</p>
