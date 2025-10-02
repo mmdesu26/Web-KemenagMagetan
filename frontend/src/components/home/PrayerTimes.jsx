@@ -160,7 +160,7 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 						<FaMosque className="text-white text-sm" />
 					</div>
 					<div>
-						<h2 className="text-lg font-bold text-black-900">
+						<h2 className="text-lg font-bold text-green-900">
 							{!isMobile && "Jadwal "}Sholat
 						</h2>
 						<p className="text-sm text-gray-500">Magetan, Jawa Timur</p>

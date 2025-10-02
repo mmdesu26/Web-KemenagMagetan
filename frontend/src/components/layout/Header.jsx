@@ -366,7 +366,7 @@ const Header = () => {
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center">
-            <img src="/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
+            <img src="/assets/images/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
             <div>
               <h1 className="text-lg font-bold text-green-800">KEMENTERIAN AGAMA</h1>
               <p className="text-sm text-gray-600">Kabupaten Magetan</p>
@@ -456,17 +456,6 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center space-x-4">
-            <div className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Cari..."
-                className="border border-gray-300 rounded-full py-1 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="absolute left-3 top-2 text-gray-400" />
-            </div>
-
             <button className="md:hidden text-green-800" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
@@ -483,17 +472,6 @@ const Header = () => {
             className="md:hidden bg-white shadow-lg rounded-b-lg overflow-hidden"
           >
             <div className="p-4">
-              <div className="relative mb-4">
-                <input
-                  type="text"
-                  placeholder="Cari..."
-                  className="border border-gray-300 rounded-full py-2 px-4 pl-10 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              </div>
-
               <nav className="flex flex-col space-y-3">
                 {menuItems.map((item, index) => (
                   <div key={index}>

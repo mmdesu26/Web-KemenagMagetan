@@ -30,15 +30,6 @@ const Footer = () => {
 				{ name: "Layanan", url: "/layanan" },
 			],
 		},
-		{
-			title: "Layanan",
-			links: [
-				{ name: "PTSP", url: "/ptsp" },
-				{ name: "PPID", url: "/ppid" },
-				{ name: "FAQ", url: "/faq" },
-				{ name: "Pengaduan", url: "/pengaduan" },
-			],
-		},
 	];
 
 	return (
