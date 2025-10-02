@@ -49,3 +49,5 @@ const Header = ({ onMenuClick }: HeaderProps) => {
     </header>
   )
 }
+
+export default Header

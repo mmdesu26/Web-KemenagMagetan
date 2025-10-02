@@ -4,7 +4,8 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { AnimatePresence } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,7 +46,7 @@ export default function AdminLogin() {
     }
   }
 
-  const containerVariants = {
+   const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
@@ -58,7 +59,7 @@ export default function AdminLogin() {
     },
   }
 
-  const formVariants = {
+  const formVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
@@ -70,7 +71,7 @@ export default function AdminLogin() {
     },
   }
 
-  const inputVariants = {
+  const inputVariants: Variants = {
     focus: {
       scale: 1.02,
       boxShadow: "0 0 0 3px rgba(34, 197, 94, 0.1)",
