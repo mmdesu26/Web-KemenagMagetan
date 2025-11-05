@@ -1,12 +1,31 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { news } from "../../data/news";
 import { FaCalendarAlt, FaFilter, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const News = ({ category, title, isMobile }) => {
 	const [sortBy, setSortBy] = useState("newest");
 	const [selectedDate, setSelectedDate] = useState(null);
 	const inputRef = useRef(null);
+	const [items, setItems] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+
+	useEffect(() => {
+		const loadNews = async () => {
+			try {
+				setLoading(true);
+				setError("");
+				const data = await apiClient.get("/public/news", { category, limit: 20 });
+				setItems(Array.isArray(data) ? data : []);
+			} catch (err) {
+				setError(err.message || "Gagal memuat berita");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadNews();
+	}, [category]);
 
 	const handleButtonClick = () => {
 		if (inputRef.current) {
@@ -18,8 +37,7 @@ const News = ({ category, title, isMobile }) => {
 		}
 	};
 
-	const filteredNews = news
-		.filter((item) => item.category === category)
+	const filteredNews = [...items]
 		.sort((a, b) => {
 			if (sortBy === "newest") {
 				return new Date(b.date) - new Date(a.date);
@@ -93,8 +111,16 @@ const News = ({ category, title, isMobile }) => {
 				</div>
 			</div>
 
-			<div className="space-y-3 md:space-y-4">
-				{filteredNews.slice(0, isMobile ? 2 : 3).map((item, index) => (
+		{loading && (
+			<div className="text-center text-gray-500 py-4">Memuat berita...</div>
+		)}
+
+		{error && !loading && (
+			<div className="text-center text-red-500 py-4">{error}</div>
+		)}
+
+		<div className="space-y-3 md:space-y-4">
+			{!loading && filteredNews.slice(0, isMobile ? 2 : 3).map((item, index) => (
 					<motion.article
 						key={item.id}
 						initial={{ opacity: 0, y: 20 }}
@@ -135,7 +161,7 @@ const News = ({ category, title, isMobile }) => {
 				))}
 			</div>
 
-			{filteredNews.length === 0 && (
+		{!loading && filteredNews.length === 0 && !error && (
 				<div className="text-center py-4 md:py-8 text-gray-500 text-sm md:text-base">
 					Tidak ada berita yang ditemukan untuk kriteria yang dipilih.
 				</div>

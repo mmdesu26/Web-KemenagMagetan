@@ -1,13 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { services } from "../../data/services";
 import { FaSearch, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const Services = () => {
-	const [activeCategory, setActiveCategory] = useState(0);
-	const [searchTerm, setSearchTerm] = useState("");
+    const [categories, setCategories] = useState([]);
+    const [activeCategory, setActiveCategory] = useState(0);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
-	const filteredServices = services[activeCategory].items.filter((service) =>
+    useEffect(() => {
+        const loadServices = async () => {
+            try {
+                setLoading(true);
+                setError("");
+                const data = await apiClient.get("/public/services");
+                setCategories(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message || "Gagal memuat layanan");
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadServices();
+    }, []);
+
+    useEffect(() => {
+        if (categories.length > 0 && activeCategory >= categories.length) {
+            setActiveCategory(0);
+        }
+    }, [categories, activeCategory]);
+
+    const currentCategory = categories[activeCategory] || { items: [] };
+
+    const filteredServices = currentCategory.items.filter((service) =>
 		service.name.toLowerCase().includes(searchTerm.toLowerCase())
 	);
 
@@ -30,9 +57,9 @@ const Services = () => {
 					</p>
 				</motion.div>
 
-				<div className="mb-8">
+                <div className="mb-8">
 					<div className="flex flex-wrap justify-center gap-2 mb-6">
-						{services.map((category, index) => (
+                        {categories.map((category, index) => (
 							<button
 								key={index}
 								onClick={() => setActiveCategory(index)}
@@ -59,11 +86,19 @@ const Services = () => {
 					</div>
 				</div>
 
+                {loading && (
+                    <div className="text-center text-gray-500">Memuat layanan...</div>
+                )}
+
+                {error && !loading && (
+                    <div className="text-center text-red-500">{error}</div>
+                )}
+
 				<motion.div
 					layout
 					className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
 				>
-					{filteredServices.map((service, index) => (
+                    {!loading && filteredServices.map((service, index) => (
 						<motion.div
 							key={service.id}
 							initial={{ opacity: 0, y: 20 }}

@@ -116,10 +116,11 @@ const HeroSection = () => {
                     key={i}
                     whileHover={{
                       scale: 1.07,
-                      backgroundColor: "rgba(255,255,255,0.18)",
+                      backgroundColor: "rgba(255,255,255,0.25)",
                       transition: { duration: 0.2 },
                     }}
-                    className="bg-white/15 p-3 rounded-xl text-center cursor-pointer border border-white/10 hover:border-yellow-300 transition-all duration-300 shadow"
+                    style={{ backgroundColor: "rgba(255,255,255,0.15)" }}
+                    className="p-3 rounded-xl text-center cursor-pointer border border-white/10 hover:border-yellow-300 transition-all duration-300 shadow"
                   >
                     <div className="text-2xl mb-2 flex justify-center text-yellow-300">{nilai.icon}</div>
                     <h3 className="font-bold text-sm mb-1">{nilai.title}</h3>

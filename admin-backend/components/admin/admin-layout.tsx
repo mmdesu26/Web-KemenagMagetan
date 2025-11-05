@@ -10,7 +10,6 @@ import {
   FaList,
   FaUsers,
   FaSignOutAlt,
-  FaUpload,
   FaTimes,
 } from "react-icons/fa"
 import { getAdminAuth, logoutAdmin } from "@/lib/auth"
@@ -30,7 +29,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Dashboard", icon: FaHome, path: "/admin/dashboard" },
     { name: "Kelola Menu", icon: FaList, path: "/admin/menus" },
     { name: "Kelola Berita", icon: FaNewspaper, path: "/admin/news" },
-    { name: "Upload File", icon: FaUpload, path: "/admin/uploads" },
+    { name: "Kelola Profil", icon: FaUsers, path: "/admin/profil" },
+    { name: "Kelola Info Bantuan", icon: FaList, path: "/admin/bantuan" },
+    { name: "Kelola Layanan", icon: FaList, path: "/admin/layanan" },
+    { name: "Kelola PTSP", icon: FaList, path: "/admin/ptsp" },
+    { name: "Kelola PPID", icon: FaList, path: "/admin/ppid" },
+    { name: "Kelola FAQ", icon: FaList, path: "/admin/faq" },
     { name: "Kelola Admin", icon: FaUsers, path: "/admin/users" },
   ]
 

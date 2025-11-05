@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import AuthGuard from "@/components/admin/auth-guard"
 import AdminLayout from "@/components/admin/admin-layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,15 +18,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash } from "react-icons/fa"
+import { apiClient } from "@/lib/api-client"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface MenuItem {
   id: number
   name: string
   path: string
-  order: number
+  orderIndex: number
   isActive: boolean
-  createdAt: string
-  updatedAt: string
+  parentId: number | null
+  parentName?: string | null
+  icon?: string | null
+  updatedAt?: string
 }
 
 export default function MenuManagement() {
@@ -36,106 +40,70 @@ export default function MenuManagement() {
   const [formData, setFormData] = useState({
     name: "",
     path: "",
-    order: 0,
+    orderIndex: 0,
     isActive: true,
+    parentId: "root" as "root" | number,
   })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  // Initialize with default menus from Header component
   useEffect(() => {
-    const defaultMenus: MenuItem[] = [
-      { id: 1, name: "Beranda", path: "/", order: 1, isActive: true, createdAt: "2024-01-01", updatedAt: "2024-01-01" },
-      {
-        id: 2,
-        name: "Profil",
-        path: "/profil",
-        order: 2,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      {
-        id: 3,
-        name: "Berita",
-        path: "/berita",
-        order: 3,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      {
-        id: 4,
-        name: "Info Bantuan",
-        path: "/bantuan",
-        order: 4,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      {
-        id: 5,
-        name: "Layanan",
-        path: "/layanan",
-        order: 5,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      {
-        id: 6,
-        name: "PTSP",
-        path: "/ptsp",
-        order: 6,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      {
-        id: 7,
-        name: "PPID",
-        path: "/ppid",
-        order: 7,
-        isActive: true,
-        createdAt: "2024-01-01",
-        updatedAt: "2024-01-01",
-      },
-      { id: 8, name: "FAQ", path: "/faq", order: 8, isActive: true, createdAt: "2024-01-01", updatedAt: "2024-01-01" },
-    ]
-
-    const savedMenus = localStorage.getItem("adminMenus")
-    if (savedMenus) {
-      setMenus(JSON.parse(savedMenus))
-    } else {
-      setMenus(defaultMenus)
-      localStorage.setItem("adminMenus", JSON.stringify(defaultMenus))
+    const fetchMenus = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await apiClient.getMenus()
+        if (response.success) {
+          setMenus(response.data)
+        }
+      } catch (err) {
+        setError("Gagal memuat menu")
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
     }
+
+    fetchMenus()
   }, [])
 
-  const saveMenus = (updatedMenus: MenuItem[]) => {
-    setMenus(updatedMenus)
-    localStorage.setItem("adminMenus", JSON.stringify(updatedMenus))
+  const refreshMenus = async () => {
+    try {
+      const response = await apiClient.getMenus()
+      if (response.success) {
+        setMenus(response.data)
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (editingMenu) {
-      // Update existing menu
-      const updatedMenus = menus.map((menu) =>
-        menu.id === editingMenu.id ? { ...menu, ...formData, updatedAt: new Date().toISOString() } : menu,
-      )
-      saveMenus(updatedMenus)
-    } else {
-      // Create new menu
-      const newMenu: MenuItem = {
-        id: Math.max(...menus.map((m) => m.id), 0) + 1,
-        ...formData,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      saveMenus([...menus, newMenu])
+    const payload = {
+      name: formData.name,
+      path: formData.path,
+      orderIndex: formData.orderIndex,
+      isActive: formData.isActive,
+      parentId: formData.parentId === "root" ? null : Number(formData.parentId),
     }
 
-    resetForm()
+    const submit = async () => {
+      try {
+        if (editingMenu) {
+          await apiClient.updateMenu(editingMenu.id, payload)
+        } else {
+          await apiClient.createMenu(payload)
+        }
+        await refreshMenus()
+        resetForm()
+      } catch (err) {
+        console.error(err)
+        alert("Terjadi kesalahan saat menyimpan menu")
+      }
+    }
+
+    submit()
   }
 
   const handleEdit = (menu: MenuItem) => {
@@ -143,33 +111,68 @@ export default function MenuManagement() {
     setFormData({
       name: menu.name,
       path: menu.path,
-      order: menu.order,
+      orderIndex: menu.orderIndex,
       isActive: menu.isActive,
+      parentId: menu.parentId ?? "root",
     })
     setIsDialogOpen(true)
   }
 
   const handleDelete = (id: number) => {
     if (confirm("Apakah Anda yakin ingin menghapus menu ini?")) {
-      const updatedMenus = menus.filter((menu) => menu.id !== id)
-      saveMenus(updatedMenus)
+      const submit = async () => {
+        try {
+          await apiClient.deleteMenu(id)
+          await refreshMenus()
+        } catch (err) {
+          console.error(err)
+          alert("Gagal menghapus menu")
+        }
+      }
+      submit()
     }
   }
 
   const toggleActive = (id: number) => {
-    const updatedMenus = menus.map((menu) =>
-      menu.id === id ? { ...menu, isActive: !menu.isActive, updatedAt: new Date().toISOString() } : menu,
-    )
-    saveMenus(updatedMenus)
+    const target = menus.find((menu) => menu.id === id)
+    if (!target) return
+
+    const submit = async () => {
+      try {
+        await apiClient.updateMenu(id, {
+          name: target.name,
+          path: target.path,
+          orderIndex: target.orderIndex,
+          isActive: !target.isActive,
+          parentId: target.parentId,
+        })
+        await refreshMenus()
+      } catch (err) {
+        console.error(err)
+        alert("Gagal memperbarui status menu")
+      }
+    }
+    submit()
   }
 
   const resetForm = () => {
-    setFormData({ name: "", path: "", order: 0, isActive: true })
+    setFormData({ name: "", path: "", orderIndex: 0, isActive: true, parentId: "root" })
     setEditingMenu(null)
     setIsDialogOpen(false)
   }
 
-  const sortedMenus = [...menus].sort((a, b) => a.order - b.order)
+  const sortedMenus = useMemo(
+    () =>
+      [...menus].sort((a, b) => {
+        if ((a.parentId ?? 0) !== (b.parentId ?? 0)) {
+          return (a.parentId ?? 0) - (b.parentId ?? 0)
+        }
+        return a.orderIndex - b.orderIndex
+      }),
+    [menus],
+  )
+
+  const parentOptions = useMemo(() => menus.filter((menu) => menu.parentId === null), [menus])
 
   return (
     <AuthGuard>
@@ -180,6 +183,8 @@ export default function MenuManagement() {
               <h1 className="text-3xl font-bold text-green-800">Kelola Menu</h1>
               <p className="text-gray-600 mt-2">Atur menu navigasi website</p>
             </div>
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -224,11 +229,33 @@ export default function MenuManagement() {
                     <Input
                       id="order"
                       type="number"
-                      value={formData.order}
-                      onChange={(e) => setFormData({ ...formData, order: Number.parseInt(e.target.value) })}
+                      value={formData.orderIndex}
+                      onChange={(e) => setFormData({ ...formData, orderIndex: Number.parseInt(e.target.value) })}
                       placeholder="1"
                       required
                     />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="parent">Menu Induk</Label>
+                    <Select
+                      value={String(formData.parentId)}
+                      onValueChange={(value) =>
+                        setFormData({ ...formData, parentId: value === "root" ? "root" : Number(value) })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pilih menu induk" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="root">Menu Utama</SelectItem>
+                        {parentOptions.map((parent) => (
+                          <SelectItem key={parent.id} value={String(parent.id)}>
+                            {parent.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -269,17 +296,18 @@ export default function MenuManagement() {
                     <tr className="border-b">
                       <th className="text-left py-3 px-4">Urutan</th>
                       <th className="text-left py-3 px-4">Nama Menu</th>
+                      <th className="text-left py-3 px-4">Menu Induk</th>
                       <th className="text-left py-3 px-4">Path</th>
                       <th className="text-left py-3 px-4">Status</th>
-                      <th className="text-left py-3 px-4">Terakhir Diperbarui</th>
                       <th className="text-left py-3 px-4">Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
                     {sortedMenus.map((menu) => (
                       <tr key={menu.id} className="border-b hover:bg-gray-50">
-                        <td className="py-3 px-4 font-medium">{menu.order}</td>
+                        <td className="py-3 px-4 font-medium">{menu.orderIndex}</td>
                         <td className="py-3 px-4 font-medium text-green-800">{menu.name}</td>
+                        <td className="py-3 px-4 text-sm text-gray-600">{menu.parentName || "-"}</td>
                         <td className="py-3 px-4 text-gray-600 font-mono text-sm">{menu.path}</td>
                         <td className="py-3 px-4">
                           <span
@@ -289,9 +317,6 @@ export default function MenuManagement() {
                           >
                             {menu.isActive ? "Aktif" : "Nonaktif"}
                           </span>
-                        </td>
-                        <td className="py-3 px-4 text-sm text-gray-500">
-                          {new Date(menu.updatedAt).toLocaleDateString("id-ID")}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex space-x-2">
@@ -318,6 +343,7 @@ export default function MenuManagement() {
               </div>
             </CardContent>
           </Card>
+          {loading && <p className="text-sm text-gray-500">Memuat data...</p>}
         </div>
       </AdminLayout>
     </AuthGuard>
