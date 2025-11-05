@@ -41,15 +41,15 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 
-import Home from './views/Home/Home';
+import Home from '../app/Home/Home.jsx';
 import Header from "./components/layout/Header";                // <-- pastikan path sesuai
 import SejarahInstansi from './components/profile/SejarahInstansi/page.jsx'; // <-- file yang tadi kita buat
 import VisiMisi from './components/profile/VisiMisi/page.jsx'; // <-- file yang tadi kita buat
 import TugasPokokFungsi from './components/profile/TugasPokokFungsi/page.jsx'; // <-- file yang tadi kita buat
 import KepalaKemenag from './components/profile/KepalaKemenag/page.jsx'; 
 import StrukturOrganisasi from './components/profile/StrukturOrganisasi/page.jsx'; 
-import InfoBantuan from './components/InfoBantuan/page.jsx'; 
-import FAQ from './components/FAQ/page.jsx'; 
+import InfoBantuan from '../app/InfoBantuan/page.jsx'; 
+import FAQ from '../app/FAQ/page.jsx'; 
 import Footer from "./components/layout/Footer";
 
 // Komponen pembungkus agar AnimatePresence bisa membaca perubahan lokasi

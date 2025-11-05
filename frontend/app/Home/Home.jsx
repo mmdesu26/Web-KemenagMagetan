@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Header from "../../components/layout/Header";
-import Footer from "../../components/layout/Footer";
-import HeroSection from "../../components/home/HeroSection";
-import Services from "../../components/home/Services";
-import Articles from "../../components/home/Articles";
-import News from "../../components/home/News";
-import Videos from "../../components/home/Videos";
-import Links from "../../components/home/Links";
-import PrayerTimes from "../../components/home/PrayerTimes";
-import CalendarAgenda from "../../components/home/CalendarAgenda";
+import Header from "../../src/components/layout/Header";
+import Footer from "../../src/components/layout/Footer";
+import HeroSection from "../../src/components/Home/HeroSection";
+import Services from "../../src/components/Home/Services";
+import Articles from "../../src/components/Home/Articles";
+import News from "../../src/components/Home/News";
+import Videos from "../../src/components/Home/Videos";
+import Links from "../../src/components/Home/Links";
+import PrayerTimes from "../../src/components/Home/PrayerTimes";
+import CalendarAgenda from "../../src/components/Home/CalendarAgenda";
 
 const Home = () => {
 	const [currentDate, setCurrentDate] = useState(new Date());
