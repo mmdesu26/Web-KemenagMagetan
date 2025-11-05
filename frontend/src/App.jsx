@@ -1,73 +1,43 @@
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import Home from './views/Home/Home';
-// import { AnimatePresence } from 'framer-motion';
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 
-// const App = () => {
-//   return (
-//     <Router>
-//       <AnimatePresence>
-//         <Routes>
-//           <Route path="/" element={<Home />} />
-//         </Routes>
-//       </AnimatePresence>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import Home from './views/Home/Home';
-// import { AnimatePresence } from 'framer-motion';
-// import SejarahInstansi from './components/profile/SejarahInstansi/page.jsx'; // ✅ tambahkan import
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <AnimatePresence>
-//         <Routes>
-//           <Route path="/" element={<Home />} />
-//           {/* ✅ route baru untuk halaman Sejarah Instansi */}
-//           <Route path="/sejarah-instansi" element={<SejarahInstansi />} />
-//         </Routes>
-//       </AnimatePresence>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
-
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-
-import Home from '../app/Home/Home.jsx';
-import Header from "./components/layout/Header";                // <-- pastikan path sesuai
-import SejarahInstansi from './components/profile/SejarahInstansi/page.jsx'; // <-- file yang tadi kita buat
-import VisiMisi from './components/profile/VisiMisi/page.jsx'; // <-- file yang tadi kita buat
-import TugasPokokFungsi from './components/profile/TugasPokokFungsi/page.jsx'; // <-- file yang tadi kita buat
-import KepalaKemenag from './components/profile/KepalaKemenag/page.jsx'; 
-import StrukturOrganisasi from './components/profile/StrukturOrganisasi/page.jsx'; 
-import InfoBantuan from '../app/InfoBantuan/page.jsx'; 
-import FAQ from '../app/FAQ/page.jsx'; 
+// ✅ Layout
+import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 
-// Komponen pembungkus agar AnimatePresence bisa membaca perubahan lokasi
+// ✅ Halaman HOME
+import Home from "../app/Home/page.jsx";
+
+// ✅ PROFILE
+import SejarahInstansi from "../app/profile/SejarahInstansi/page.jsx";
+import VisiMisi from "../app/profile/VisiMisi/page.jsx";
+import TugasPokokFungsi from "../app/profile/TugasPokokFungsi/page.jsx";
+import KepalaKemenag from "../app/profile/KepalaKemenag/page.jsx";
+import StrukturOrganisasi from "../app/profile/StrukturOrganisasi/page.jsx";
+
+// ✅ MENU LAIN
+import InfoBantuan from "../app/InfoBantuan/page.jsx";
+import FAQ from "../app/FAQ/page.jsx";
+
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        {/* HOME */}
         <Route path="/" element={<Home />} />
+
+        {/* PROFILE */}
         <Route path="/profil/sejarah" element={<SejarahInstansi />} />
         <Route path="/profil/visi-misi" element={<VisiMisi />} />
         <Route path="/profil/tupoksi" element={<TugasPokokFungsi />} />
         <Route path="/profil/kepala" element={<KepalaKemenag />} />
         <Route path="/profil/struktur" element={<StrukturOrganisasi />} />
+
+        {/* LAINNYA */}
         <Route path="/bantuan" element={<InfoBantuan />} />
         <Route path="/faq" element={<FAQ />} />
-        {/* tambahkan route lain di sini bila perlu */}
       </Routes>
     </AnimatePresence>
   );
@@ -76,8 +46,8 @@ function AnimatedRoutes() {
 const App = () => {
   return (
     <Router>
-      <Header />           {/* Header selalu muncul di setiap halaman */}
-      <AnimatedRoutes />   {/* Routes yang diberi animasi */}
+      <Header />
+      <AnimatedRoutes />
       <Footer />
     </Router>
   );

@@ -1,4 +1,4 @@
-import BeritaList from "@/components/BeritaList";
+import BeritaList from "@/components/Berita/BeritaList";
 
 async function getBeritaFull() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/internal/berita`, {
