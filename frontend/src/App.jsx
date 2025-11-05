@@ -5,19 +5,22 @@ import { AnimatePresence } from "framer-motion";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 
-// ✅ Halaman HOME
-import Home from "../app/Home/page.jsx";
+// ✅ HOME
+import Home from "./pages/Home/page.jsx";
 
 // ✅ PROFILE
-import SejarahInstansi from "../app/profile/SejarahInstansi/page.jsx";
-import VisiMisi from "../app/profile/VisiMisi/page.jsx";
-import TugasPokokFungsi from "../app/profile/TugasPokokFungsi/page.jsx";
-import KepalaKemenag from "../app/profile/KepalaKemenag/page.jsx";
-import StrukturOrganisasi from "../app/profile/StrukturOrganisasi/page.jsx";
+import SejarahInstansi from "./pages/Profile/SejarahInstansi/page.jsx";
+import VisiMisi from "./pages/Profile/VisiMisi/page.jsx";
+import TugasPokokFungsi from "./pages/Profile/TugasPokokFungsi/page.jsx";
+import KepalaKemenag from "./pages/Profile/KepalaKemenag/page.jsx";
+import StrukturOrganisasi from "./pages/Profile/StrukturOrganisasi/page.jsx";
+
+// ✅ BERITA
+import BeritaPage from "./pages/Berita/page.jsx";
 
 // ✅ MENU LAIN
-import InfoBantuan from "../app/InfoBantuan/page.jsx";
-import FAQ from "../app/FAQ/page.jsx";
+import InfoBantuan from "./pages/InfoBantuan/page.jsx";
+import FAQ from "./pages/FAQ/page.jsx";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -25,7 +28,6 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* HOME */}
         <Route path="/" element={<Home />} />
 
         {/* PROFILE */}
@@ -34,6 +36,9 @@ function AnimatedRoutes() {
         <Route path="/profil/tupoksi" element={<TugasPokokFungsi />} />
         <Route path="/profil/kepala" element={<KepalaKemenag />} />
         <Route path="/profil/struktur" element={<StrukturOrganisasi />} />
+
+        {/* BERITA */}
+        <Route path="/berita" element={<BeritaPage />} />
 
         {/* LAINNYA */}
         <Route path="/bantuan" element={<InfoBantuan />} />

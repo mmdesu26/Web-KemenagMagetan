@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Header from "../../src/components/layout/Header";
-import Footer from "../../src/components/layout/Footer";
-import HeroSection from "../../src/components/Home/HeroSection";
-import Services from "../../src/components/Home/Services";
-import Articles from "../../src/components/Home/Articles";
-import News from "../../src/components/Home/News";
-import Videos from "../../src/components/Home/Videos";
-import Links from "../../src/components/Home/Links";
-import PrayerTimes from "../../src/components/Home/PrayerTimes";
-import CalendarAgenda from "../../src/components/Home/CalendarAgenda";
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
+import HeroSection from "../../components/Home/HeroSection";
+import Services from "../../components/Home/Services";
+import Articles from "../../components/Home/Articles";
+import News from "../../components/Home/News";
+import Videos from "../../components/Home/Videos";
+import Links from "../../components/Home/Links";
+import PrayerTimes from "../../components/Home/PrayerTimes";
+import CalendarAgenda from "../../components/Home/CalendarAgenda";
 
 const Home = () => {
 	const [currentDate, setCurrentDate] = useState(new Date());
@@ -63,14 +63,19 @@ const Home = () => {
 						<div className="space-y-8">
 							{/* Berita Kemenag */}
 							<News
-								category="kemenag"
-								title="Berita Kemenag"
-								isMobile={isMobile}
-							/>
+  category="kemenag"
+  title="Berita Kemenag"
+  isMobile={isMobile}
+  limit={4}
+/>
 
-							{/* Berita Umum */}
-							<News category="umum" title="Berita Umum" isMobile={isMobile} />
-						</div>
+<News
+  category="umum"
+  title="Berita Umum"
+  isMobile={isMobile}
+  limit={4}
+/>
+</div>
 					</div>
 
 					{/* Right Column - Sidebar */}

@@ -1,10 +1,14 @@
 import BeritaCard from "./BeritaCard";
 
 const BeritaList = ({ data }) => {
+  const list = Array.isArray(data) ? data : [];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {data.map((item, index) => (
-        <BeritaCard key={index} item={item} />
+      {list.length === 0 && <p>Tidak ada berita.</p>}
+
+      {list.map((item, index) => (
+        <BeritaCard key={item.id || index} item={item} />
       ))}
     </div>
   );

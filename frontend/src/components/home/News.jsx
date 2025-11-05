@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { FaCalendarAlt, FaFilter, FaArrowRight } from "react-icons/fa";
 import { apiClient } from "../../api/client";
 
-const News = ({ category, title, isMobile }) => {
+const News = ({ category, title, isMobile, limit = 4 }) => {
 	const [sortBy, setSortBy] = useState("newest");
 	const [selectedDate, setSelectedDate] = useState(null);
 	const inputRef = useRef(null);
@@ -103,11 +103,12 @@ const News = ({ category, title, isMobile }) => {
 					</div>
 
 					<a
-						href={`/news?category=${category}`}
-						className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex items-center"
-					>
-						Lihat <FaArrowRight className="ml-1 hidden md:inline" />
-					</a>
+  href={`/berita?category=${category}`}
+  className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex items-center"
+>
+  Lihat <FaArrowRight className="ml-1 hidden md:inline" />
+</a>
+
 				</div>
 			</div>
 
@@ -120,17 +121,18 @@ const News = ({ category, title, isMobile }) => {
 		)}
 
 		<div className="space-y-3 md:space-y-4">
-			{!loading && filteredNews.slice(0, isMobile ? 2 : 3).map((item, index) => (
+			{!loading && filteredNews.slice(0, limit).map((item, index) => (
 					<motion.article
-						key={item.id}
-						initial={{ opacity: 0, y: 20 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.3, delay: index * 0.1 }}
-						whileHover={{ x: isMobile ? 0 : 5 }}
-						className={`flex ${
-							isMobile ? "flex-col" : "flex-row"
-						} gap-3 md:gap-4 p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors`}
-					>
+  key={item.id}
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3, delay: index * 0.1 }}
+  whileHover={{ x: isMobile ? 0 : 4 }}
+  className={`news-card flex ${
+    isMobile ? "flex-col" : "flex-row"
+  } gap-3 md:gap-4 p-3 md:p-4 border border-gray-200 rounded-lg`}
+>
+
 						<img
 							src={item.image}
 							alt={item.title}
