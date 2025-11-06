@@ -49,6 +49,8 @@ import TugasPokokFungsi from './components/profile/TugasPokokFungsi/page.jsx'; /
 import KepalaKemenag from './components/profile/KepalaKemenag/page.jsx'; 
 import StrukturOrganisasi from './components/profile/StrukturOrganisasi/page.jsx'; 
 import InfoBantuan from './components/InfoBantuan/page.jsx'; 
+import TugasPtsp from './components/PTSP/TugasPtsp/page.jsx'; 
+import PtspOnline from './components/PTSP/PtspOnline/page.jsx'; 
 import FAQ from './components/FAQ/page.jsx'; 
 import Footer from "./components/layout/Footer";
 
@@ -66,6 +68,8 @@ function AnimatedRoutes() {
         <Route path="/profil/kepala" element={<KepalaKemenag />} />
         <Route path="/profil/struktur" element={<StrukturOrganisasi />} />
         <Route path="/bantuan" element={<InfoBantuan />} />
+        <Route path="/ptsp/tugas" element={<TugasPtsp />} />
+        <Route path="/ptsp/online" element={<PtspOnline />} />
         <Route path="/faq" element={<FAQ />} />
         {/* tambahkan route lain di sini bila perlu */}
       </Routes>

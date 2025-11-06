@@ -13,7 +13,7 @@ const bantuanList = [
 
 export default function InfoBantuan() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 pt-33 pb-12 px-4">
       {/* Judul Halaman */}
       <motion.h1
         className="text-4xl md:text-5xl font-extrabold text-center text-green-800 mb-10"
