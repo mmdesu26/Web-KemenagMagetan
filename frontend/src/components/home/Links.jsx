@@ -1,11 +1,35 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { links } from "../../data/links";
 import { FaExternalLinkAlt } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const Links = () => {
-	// Duplikasi array links untuk membuat loop seamless
-	const duplicatedLinks = [...links, ...links];
+	const [items, setItems] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+
+	useEffect(() => {
+		const loadLinks = async () => {
+			try {
+				setLoading(true);
+				setError("");
+				const data = await apiClient.get("/public/links");
+				setItems(Array.isArray(data) ? data : []);
+			} catch (err) {
+				setError(err.message || "Gagal memuat tautan");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadLinks();
+	}, []);
+
+	const duplicatedLinks = useMemo(() => {
+		if (items.length === 0) return [];
+		return [...items, ...items];
+	}, [items]);
+
+	const itemCount = items.length || 1;
 
 	return (
 		<motion.div
@@ -17,17 +41,23 @@ const Links = () => {
 		>
 			<h2 className="text-xl font-bold text-green-800 mb-6">Link Terkait</h2>
 
+			{loading && (
+				<div className="text-center text-gray-500">Memuat tautan...</div>
+			)}
+
+			{error && !loading && (
+				<div className="text-center text-red-500 mb-4">{error}</div>
+			)}
+
 			<div className="relative overflow-hidden">
 				<motion.div
 					className="flex gap-4"
-					animate={{
-						x: [0, -((links.length * 176) + (links.length * 16))], // 176px = width (160px) + gap (16px)
-					}}
-					transition={{
-						duration: links.length * 2, // Durasi berdasarkan jumlah link
+					animate={duplicatedLinks.length > 0 ? { x: [0, -((itemCount * 176) + (itemCount * 16))] } : undefined}
+					transition={duplicatedLinks.length > 0 ? {
+						duration: Math.max(itemCount * 2, 4),
 						repeat: Infinity,
 						ease: "linear",
-					}}
+					} : undefined}
 				>
 					{duplicatedLinks.map((link, index) => (
 						<motion.a

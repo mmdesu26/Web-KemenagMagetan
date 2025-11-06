@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaMosque, FaClock, FaSun, FaMoon, FaCalendarAlt } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 	const [prayerTimes, setPrayerTimes] = useState({
@@ -10,6 +11,8 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 		maghrib: "18:00",
 		isya: "19:15",
 	});
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
 	const [currentPrayer, setCurrentPrayer] = useState("");
 	const [nextPrayer, setNextPrayer] = useState("");
@@ -35,15 +38,40 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 	};
 
 	useEffect(() => {
+		const loadPrayerTimes = async () => {
+			try {
+				setLoading(true);
+				setError("");
+				const date = currentDate.toISOString().split("T")[0];
+				const data = await apiClient.get("/public/prayer-times", { date });
+				if (data) {
+					setPrayerTimes({
+						subuh: (data.subuh || "04:30:00").slice(0, 5),
+						dzuhur: (data.dzuhur || "12:00:00").slice(0, 5),
+						ashar: (data.ashar || "15:15:00").slice(0, 5),
+						maghrib: (data.maghrib || "18:00:00").slice(0, 5),
+						isya: (data.isya || "19:15:00").slice(0, 5),
+					});
+				}
+			} catch (err) {
+				setError(err.message || "Gagal memuat jadwal sholat");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadPrayerTimes();
+	}, [currentDate]);
+
+	useEffect(() => {
 		updateCurrentPrayer();
-		
+
 		const interval = setInterval(() => {
 			setCurrentTime(new Date());
 			updateCurrentPrayer();
-		}, 1000); // Update every second for real-time
+		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [currentDate]);
+	}, [currentDate, prayerTimes]);
 
 
 
@@ -182,6 +210,14 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 					</div>
 				</div>
 			</motion.div>
+
+			{loading && (
+				<div className="text-center text-gray-500 py-2">Memuat jadwal...</div>
+			)}
+
+			{error && !loading && (
+				<div className="text-center text-red-500 py-2">{error}</div>
+			)}
 
 			{/* Current Prayer Status */}
 			<AnimatePresence mode="wait">

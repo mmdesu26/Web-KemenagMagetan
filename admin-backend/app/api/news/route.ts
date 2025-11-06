@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
+import { query } from "@/lib/mysql"
 
+// ✅ GET all news (with filter + pagination)
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -8,98 +10,107 @@ export async function GET(request: NextRequest) {
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
 
-    // Sample news data
-    const sampleNews = [
-      {
-        id: 1,
-        title: "Pelaksanaan Sholat Jumat di Masjid Agung",
-        content:
-          "Kemenag Magetan mengumumkan jadwal sholat Jumat di Masjid Agung dengan protokol kesehatan yang ketat.",
-        excerpt: "Jadwal sholat Jumat dengan protokol kesehatan ketat",
-        category: "Keagamaan",
-        status: "published",
-        image: "/majestic-masjid.png",
-        author: "Admin Kemenag",
-        publishedAt: "2024-01-15T10:00:00Z",
-        createdAt: "2024-01-15T09:00:00Z",
-      },
-      {
-        id: 2,
-        title: "Program Bantuan Sosial Ramadhan 2024",
-        content: "Kemenag Magetan meluncurkan program bantuan sosial untuk masyarakat kurang mampu di bulan Ramadhan.",
-        excerpt: "Program bantuan sosial untuk masyarakat kurang mampu",
-        category: "Sosial",
-        status: "published",
-        image: "/bantuan-sosial.jpg",
-        author: "Admin Kemenag",
-        publishedAt: "2024-01-14T08:00:00Z",
-        createdAt: "2024-01-14T07:00:00Z",
-      },
-    ]
-
-    let filteredNews = sampleNews
+    let sql = "SELECT * FROM news WHERE 1=1"
+    const params: any[] = []
 
     if (category && category !== "all") {
-      filteredNews = filteredNews.filter((news) => news.category === category)
+      sql += " AND category = ?"
+      params.push(category)
     }
 
     if (status && status !== "all") {
-      filteredNews = filteredNews.filter((news) => news.status === status)
+      sql += " AND status = ?"
+      params.push(status)
     }
 
-    const startIndex = (page - 1) * limit
-    const paginatedNews = filteredNews.slice(startIndex, startIndex + limit)
+    sql += " ORDER BY createdAt DESC LIMIT ? OFFSET ?"
+    params.push(limit, (page - 1) * limit)
+
+    const data = await query(sql, params)
+
+    const countRes: any = await query(
+      "SELECT COUNT(*) as total FROM news WHERE 1=1" +
+        (category && category !== "all" ? " AND category = ?" : "") +
+        (status && status !== "all" ? " AND status = ?" : ""),
+      params.slice(0, params.length - 2) // exclude limit & offset
+    )
 
     return NextResponse.json({
       success: true,
-      data: paginatedNews,
+      data,
       pagination: {
         page,
         limit,
-        total: filteredNews.length,
-        totalPages: Math.ceil(filteredNews.length / limit),
+        total: countRes[0].total,
+        totalPages: Math.ceil(countRes[0].total / limit),
       },
     })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }
 
+// ✅ POST add news
 export async function POST(request: NextRequest) {
   try {
-    const newsData = await request.json()
+    const { title, content, excerpt, category, status, image } = await request.json()
+    const now = new Date()
 
-    const newNews = {
-      id: Date.now(),
-      ...newsData,
-      author: "Admin Kemenag",
-      createdAt: new Date().toISOString(),
-      publishedAt: newsData.status === "published" ? new Date().toISOString() : null,
-    }
+    const result: any = await query(
+      "INSERT INTO news (title, content, excerpt, category, status, image, author, createdAt, publishedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [
+        title,
+        content,
+        excerpt,
+        category,
+        status,
+        image,
+        "Admin Kemenag",
+        now,
+        status === "published" ? now : null,
+      ]
+    )
 
-    return NextResponse.json({ success: true, data: newNews })
+    return NextResponse.json({
+      success: true,
+      data: { id: result.insertId, title, content, category, status, image },
+    })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }
 
+// ✅ PUT update news
 export async function PUT(request: NextRequest) {
   try {
-    const { id, ...updateData } = await request.json()
+    const { id, title, content, excerpt, category, status, image } = await request.json()
+    const now = new Date()
 
-    const updatedNews = {
-      id,
-      ...updateData,
-      updatedAt: new Date().toISOString(),
-      publishedAt: updateData.status === "published" ? new Date().toISOString() : null,
-    }
+    await query(
+      "UPDATE news SET title=?, content=?, excerpt=?, category=?, status=?, image=?, updatedAt=?, publishedAt=? WHERE id=?",
+      [
+        title,
+        content,
+        excerpt,
+        category,
+        status,
+        image,
+        now,
+        status === "published" ? now : null,
+        id,
+      ]
+    )
 
-    return NextResponse.json({ success: true, data: updatedNews })
+    return NextResponse.json({ success: true })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }
 
+// ✅ DELETE news
 export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -109,8 +120,11 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "News ID required" }, { status: 400 })
     }
 
+    await query("DELETE FROM news WHERE id = ?", [id])
+
     return NextResponse.json({ success: true, message: "News deleted successfully" })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: "Server error" }, { status: 500 })
   }
 }

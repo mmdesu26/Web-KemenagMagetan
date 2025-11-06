@@ -35,7 +35,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-<section className="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 text-white pt-8 pb-12 sm:pt-12 sm:pb-16 md:pt-29 md:pb-20 overflow-hidden">
+    <section className="relative bg-linear-to-br from-green-700 via-green-600 to-green-500 text-white pt-8 pb-12 sm:pt-12 sm:pb-16 md:pt-29 md:pb-20 overflow-hidden">
       {/* === Corak Bambu === */}
       <div
         className="absolute inset-0 bg-[url('/assets/images/bambuu.png')] 
@@ -74,23 +74,44 @@ const HeroSection = () => {
             </motion.p>
 
             {/* Nilai-nilai */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1 sm:gap-2 md:gap-3 max-w-3xl mx-auto lg:mx-0">
-              {values.map((nilai, i) => (
-                <motion.div
-                  key={i}
-                  whileHover={{
-                    scale: 1.05,
-                    backgroundColor: "rgba(255,255,255,0.18)",
-                    transition: { duration: 0.2 },
-                  }}
-                  className="bg-white/15 p-1 sm:p-2 rounded-lg text-center cursor-pointer border border-white/10 hover:border-yellow-300 transition-all duration-300 shadow"
-                >
-                  <div className="text-sm sm:text-base md:text-lg mb-1 flex justify-center text-yellow-300">{nilai.icon}</div>
-                  <h3 className="font-bold text-xs mb-1">{nilai.title}</h3>
-                  <p className="text-xs opacity-90 hidden sm:block md:hidden lg:block leading-tight">{nilai.desc}</p>
-                </motion.div>
-              ))}
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            >
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 max-w-3xl mx-auto lg:mx-0">
+                {values.map((nilai, i) => (
+                  <motion.div
+                    key={i}
+                    whileH6over={{
+                      scale: 1.07,
+                      backgroundColor: "rgba(255,255,255,0.25)",
+                      transition: { duration: 0.2 },
+                    }}
+                    style={{ backgroundColor: "rgba(255,255,255,0.15)" }}
+                    className="p-2 md:p-3 rounded-lg text-center cursor-pointer border border-white/10 hover:border-yellow-300 transition-all duration-300 shadow"
+                  >
+                    <div className="text-lg sm:text-xl md:text-2xl mb-1 flex justify-center text-yellow-300">{nilai.icon}</div>
+                    <h3 className="font-bold text-xs md:text-sm mb-1">{nilai.title}</h3>
+                    <p className="text-[10px] sm:text-xs opacity-90 leading-tight">{nilai.desc}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 1 }}
+              className="mt-6"
+            >
+              <a
+                href="#layanan"
+                className="inline-block px-6 py-3 rounded-full bg-yellow-300 text-green-900 font-semibold shadow-lg hover:bg-yellow-400 transition"
+              >
+                Lihat Layanan Kami
+              </a>
+            </motion.div>
           </motion.div>
 
           {/* ==== Kanan: Gambar Hero ==== */}
@@ -101,19 +122,10 @@ const HeroSection = () => {
             className="w-full lg:w-1/2 flex justify-center items-center"
           >
             <div
-              className="
-                relative w-full 
-                max-w-lg sm:max-w-xl md:max-w-5xl lg:max-w-8xl /* ✅ lebih besar */
-                mx-auto
-              "
+              className="relative w-full max-w-lg sm:max-w-xl md:max-w-5xl lg:max-w-6xl mx-auto"
             >
               <div
-                className="
-                  relative overflow-hidden rounded-lg sm:rounded-xl 
-                  shadow-2xl bg-gradient-to-br from-white/20 to-white/5 
-                  p-1 sm:p-1 md:p-1 /* ✅ padding diperkecil */
-                  backdrop-blur-sm border border-white/10 /* ✅ border lebih tipis */
-                "
+                className="relative overflow-hidden rounded-lg sm:rounded-xl shadow-2xl bg-linear-to-br from-white/20 to-white/5 p-1 backdrop-blur-sm border border-white/10"
               >
                 <AnimatePresence mode="wait">
                   <motion.img

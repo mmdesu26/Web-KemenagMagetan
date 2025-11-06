@@ -41,7 +41,7 @@ const TugasPPIDModern = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-yellow-50 pt-28 pb-16 px-4 sm:px-6 md:px-10">
+    <div className="min-h-screen bg-linear-to-br from-green-50 to-yellow-50 pt-28 pb-16 px-4 sm:px-6 md:px-10">
       {/* Header */}
       <div className="text-center mb-12 md:mb-16">
         <motion.h1
@@ -62,7 +62,7 @@ const TugasPPIDModern = () => {
       {/* Tugas Section */}
       <section className="max-w-6xl mx-auto mb-16">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 flex items-center gap-3">
-          <FaShieldAlt className="text-green-600 flex-shrink-0" />
+          <FaShieldAlt className="text-green-600 shrink-0" />
           <span>Tugas Utama</span>
         </h2>
 
@@ -82,7 +82,7 @@ const TugasPPIDModern = () => {
                   onClick={() => setActiveIndex(active ? null : idx)}
                   className="w-full p-5 sm:p-6 flex flex-col items-center"
                 >
-                  <div className="bg-gradient-to-br from-green-600 to-yellow-600 p-3 sm:p-4 rounded-full mb-3 sm:mb-4">
+                  <div className="bg-linear-to-br from-green-600 to-yellow-600 p-3 sm:p-4 rounded-full mb-3 sm:mb-4">
                     <Icon className="text-white text-xl sm:text-2xl" />
                   </div>
                   <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 text-center">
@@ -118,7 +118,7 @@ const TugasPPIDModern = () => {
       {/* Wewenang Section */}
       <section className="max-w-6xl mx-auto mb-16 px-2 sm:px-0">
         <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-          <FaGavel className="text-yellow-600 flex-shrink-0" />
+          <FaGavel className="text-yellow-600 shrink-0" />
           <span>Wewenang PPID</span>
         </h2>
         <div className="space-y-3">
@@ -140,7 +140,7 @@ const TugasPPIDModern = () => {
       </section>
 
       {/* Informasi Tambahan */}
-      <section className="max-w-5xl mx-auto text-center bg-gradient-to-r from-green-600 to-yellow-600 rounded-3xl p-8 sm:p-10 md:p-12 shadow-xl text-white">
+      <section className="max-w-5xl mx-auto text-center bg-linear-to-r from-green-600 to-yellow-600 rounded-3xl p-8 sm:p-10 md:p-12 shadow-xl text-white">
         <motion.h3
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

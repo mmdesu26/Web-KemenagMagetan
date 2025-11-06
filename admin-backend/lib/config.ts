@@ -90,6 +90,7 @@ export const config = {
     prefix: process.env.API_PREFIX || "/api",
     timeout: Number.parseInt(process.env.API_TIMEOUT || "30000"),
     enableSwagger: process.env.ENABLE_SWAGGER === "true",
+    backendUrl: process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000",
   },
 
   // Frontend configuration

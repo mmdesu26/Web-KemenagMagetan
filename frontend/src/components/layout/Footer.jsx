@@ -34,7 +34,8 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-4">Kontak Kami</h3>
             <ul className="space-y-3 text-sm md:text-base">
               <li className="flex items-start">
-                <FaMapMarkerAlt className="mt-1 mr-3 flex-shrink-0" />
+                <FaMapMarkerAlt className="mt-1 mr-3 
+                shrink-0" />
                 <span>Jl. Raya Magetan No. 123, Magetan, Jawa Timur</span>
               </li>
               <li className="flex items-center">

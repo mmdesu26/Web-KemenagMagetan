@@ -20,6 +20,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FaPlus, FaEdit, FaTrash, FaUser, FaEye, FaEyeSlash, FaUserShield } from "react-icons/fa"
 import { getAdminAuth } from "@/lib/auth"
+import { apiClient } from "@/lib/api-client"
 
 interface AdminUser {
   id: number
@@ -49,51 +50,30 @@ export default function AdminUserManagement() {
     isActive: true,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const currentUser = getAdminAuth()
 
-  // Initialize with default admin users
   useEffect(() => {
-    const defaultUsers: AdminUser[] = [
-      {
-        id: 1,
-        username: "admin",
-        email: "admin@kemenagmagetan.go.id",
-        fullName: "Administrator",
-        role: "admin",
-        isActive: true,
-        lastLogin: "2024-01-15T10:00:00Z",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z",
-        createdBy: "System",
-      },
-      {
-        id: 2,
-        username: "superadmin",
-        email: "superadmin@kemenagmagetan.go.id",
-        fullName: "Super Administrator",
-        role: "superadmin",
-        isActive: true,
-        lastLogin: "2024-01-14T15:30:00Z",
-        createdAt: "2024-01-01T00:00:00Z",
-        updatedAt: "2024-01-01T00:00:00Z",
-        createdBy: "System",
-      },
-    ]
-
-    const savedUsers = localStorage.getItem("adminUsers")
-    if (savedUsers) {
-      setUsers(JSON.parse(savedUsers))
-    } else {
-      setUsers(defaultUsers)
-      localStorage.setItem("adminUsers", JSON.stringify(defaultUsers))
+    const loadUsers = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const response = await apiClient.getUsers()
+        if (response.success) {
+          setUsers(response.data)
+        }
+      } catch (err) {
+        console.error(err)
+        setError("Gagal memuat data admin")
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [])
 
-  const saveUsers = (updatedUsers: AdminUser[]) => {
-    setUsers(updatedUsers)
-    localStorage.setItem("adminUsers", JSON.stringify(updatedUsers))
-  }
+    loadUsers()
+  }, [])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -134,45 +114,37 @@ export default function AdminUserManagement() {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validateForm()) return
 
-    if (editingUser) {
-      // Update existing user
-      const updatedUsers = users.map((user) =>
-        user.id === editingUser.id
-          ? {
-              ...user,
-              username: formData.username,
-              email: formData.email,
-              fullName: formData.fullName,
-              role: formData.role,
-              isActive: formData.isActive,
-              updatedAt: new Date().toISOString(),
-            }
-          : user,
-      )
-      saveUsers(updatedUsers)
-    } else {
-      // Create new user
-      const newUser: AdminUser = {
-        id: Math.max(...users.map((u) => u.id), 0) + 1,
-        username: formData.username,
-        email: formData.email,
-        fullName: formData.fullName,
-        role: formData.role,
-        isActive: formData.isActive,
-        lastLogin: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: currentUser?.username || "Unknown",
+    try {
+      if (editingUser) {
+        await apiClient.updateUser(editingUser.id, {
+          email: formData.email,
+          fullName: formData.fullName,
+          role: formData.role,
+          isActive: formData.isActive,
+        })
+      } else {
+        await apiClient.createUser({
+          username: formData.username,
+          email: formData.email,
+          fullName: formData.fullName,
+          password: formData.password,
+          role: formData.role,
+          isActive: formData.isActive,
+        })
       }
-      saveUsers([...users, newUser])
+      const response = await apiClient.getUsers()
+      if (response.success) {
+        setUsers(response.data)
+      }
+      resetForm()
+    } catch (err) {
+      console.error(err)
+      alert("Terjadi kesalahan saat menyimpan admin")
     }
-
-    resetForm()
   }
 
   const handleEdit = (user: AdminUser) => {
@@ -189,50 +161,65 @@ export default function AdminUserManagement() {
     setIsDialogOpen(true)
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     const userToDelete = users.find((u) => u.id === id)
     if (!userToDelete) return
 
-    // Prevent deleting current user
     if (userToDelete.username === currentUser?.username) {
       alert("Anda tidak dapat menghapus akun yang sedang digunakan!")
       return
     }
 
-    // Prevent deleting the last superadmin
     const superAdmins = users.filter((u) => u.role === "superadmin" && u.isActive)
     if (userToDelete.role === "superadmin" && superAdmins.length === 1) {
       alert("Tidak dapat menghapus superadmin terakhir!")
       return
     }
 
-    if (confirm(`Apakah Anda yakin ingin menghapus user "${userToDelete.fullName}"?`)) {
-      const updatedUsers = users.filter((user) => user.id !== id)
-      saveUsers(updatedUsers)
+    if (!confirm(`Apakah Anda yakin ingin menghapus user "${userToDelete.fullName}"?`)) return
+
+    try {
+      await apiClient.deleteUser(id)
+      const response = await apiClient.getUsers()
+      if (response.success) {
+        setUsers(response.data)
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Gagal menghapus admin")
     }
   }
 
-  const toggleActive = (id: number) => {
+  const toggleActive = async (id: number) => {
     const userToToggle = users.find((u) => u.id === id)
     if (!userToToggle) return
 
-    // Prevent deactivating current user
     if (userToToggle.username === currentUser?.username) {
       alert("Anda tidak dapat menonaktifkan akun yang sedang digunakan!")
       return
     }
 
-    // Prevent deactivating the last active superadmin
     const activeSuperAdmins = users.filter((u) => u.role === "superadmin" && u.isActive)
     if (userToToggle.role === "superadmin" && userToToggle.isActive && activeSuperAdmins.length === 1) {
       alert("Tidak dapat menonaktifkan superadmin terakhir!")
       return
     }
 
-    const updatedUsers = users.map((user) =>
-      user.id === id ? { ...user, isActive: !user.isActive, updatedAt: new Date().toISOString() } : user,
-    )
-    saveUsers(updatedUsers)
+    try {
+      await apiClient.updateUser(id, {
+        email: userToToggle.email,
+        fullName: userToToggle.fullName,
+        role: userToToggle.role,
+        isActive: !userToToggle.isActive,
+      })
+      const response = await apiClient.getUsers()
+      if (response.success) {
+        setUsers(response.data)
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Gagal memperbarui status admin")
+    }
   }
 
   const resetForm = () => {
@@ -411,6 +398,8 @@ export default function AdminUserManagement() {
             </Dialog>
           </div>
 
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
           <Card>
             <CardHeader>
               <CardTitle>Daftar Administrator</CardTitle>
@@ -419,6 +408,9 @@ export default function AdminUserManagement() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {loading ? (
+                <p className="text-sm text-gray-500">Memuat data...</p>
+              ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -513,6 +505,7 @@ export default function AdminUserManagement() {
                   </tbody>
                 </table>
               </div>
+              )}
             </CardContent>
           </Card>
         </div>

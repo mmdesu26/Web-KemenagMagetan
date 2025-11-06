@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { videos } from "../../data/videos";
 import { FaPlay, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
-const Videos = () => {
+const Videos = ({ showItems = 2 }) => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const loadVideos = async () => {
+            try {
+                setLoading(true);
+                setError("");
+                const data = await apiClient.get("/public/videos");
+                setItems(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message || "Gagal memuat video");
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadVideos();
+    }, []);
+
+    const visibleVideos = items.slice(0, showItems);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 50 }}
@@ -22,8 +44,16 @@ const Videos = () => {
 				</a>
 			</div>
 
+			{loading && (
+				<div className="text-center text-gray-500">Memuat video...</div>
+			)}
+
+			{error && !loading && (
+				<div className="text-center text-red-500 mb-3">{error}</div>
+			)}
+
 			<div className="space-y-4">
-				{videos.slice(0, 2).map((video, index) => (
+				{!loading && visibleVideos.map((video, index) => (
 					<motion.div
 						key={video.id}
 						initial={{ opacity: 0, y: 20 }}

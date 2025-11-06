@@ -127,7 +127,7 @@ const InformasiBerkala = () => {
   };
 
   return (
-  <div className="min-h-screen bg-gradient-to-br from-slate-50 to-green-50 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+  <div className="min-h-screen bg-linear-to-br from-slate-50 to-green-50 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -206,7 +206,7 @@ const InformasiBerkala = () => {
                                   href={item.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex-shrink-0"
+                                  className="shrink-0"
                                 >
                                   <div className={`${colorClasses.bg} ${colorClasses.hover} px-4 py-2 rounded-lg flex items-center gap-2 transition-colors cursor-pointer`}>
                                     <Download className="w-4 h-4 text-white" strokeWidth={2} />

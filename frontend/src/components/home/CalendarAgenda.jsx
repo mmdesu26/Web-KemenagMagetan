@@ -1,43 +1,37 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const CalendarAgenda = ({ currentDate, isMobile }) => {
 	const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
 	const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
 	const [selectedDate, setSelectedDate] = useState(currentDate);
+	const [agenda, setAgenda] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
-	// Sample agenda data
-	const [agenda, setAgenda] = useState([
-		{
-			id: 1,
-			date: new Date(2025, 7, 15),
-			title: "Apel Pagi ASN Kemenag",
-			description: "Apel pagi seluruh ASN Kemenag Magetan",
-			location: "Halaman Kantor Kemenag Magetan",
-		},
-		{
-			id: 2,
-			date: new Date(2025, 7, 17),
-			title: "Pelatihan Digitalisasi Layanan",
-			description: "Pelatihan untuk seluruh petugas layanan digital",
-			location: "Aula Kemenag Magetan",
-		},
-		{
-			id: 3,
-			date: new Date(2025, 7, 20),
-			title: "Pengajian Bulanan",
-			description: "Pengajian bulanan untuk masyarakat umum",
-			location: "Masjid Agung Magetan",
-		},
-		{
-			id: 4,
-			date: new Date(2025, 7, 25),
-			title: "Rapat Koordinasi",
-			description: "Rapat koordinasi dengan seluruh kepala seksi",
-			location: "Ruang Rapat Kemenag",
-		},
-	]);
+	useEffect(() => {
+		const loadAgenda = async () => {
+			try {
+				setLoading(true);
+				setError("");
+				const data = await apiClient.get("/public/agendas");
+				const items = Array.isArray(data)
+					? data.map((item) => ({
+						...item,
+						date: new Date(item.date || item.event_date || item.eventDate),
+					}))
+					: [];
+				setAgenda(items);
+			} catch (err) {
+				setError(err.message || "Gagal memuat agenda");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadAgenda();
+	}, []);
 
 	const daysInMonth = (month, year) => {
 		return new Date(year, month + 1, 0).getDate();
@@ -142,6 +136,14 @@ const CalendarAgenda = ({ currentDate, isMobile }) => {
 					{isMobile ? <FaArrowRight /> : "Lihat semua"}
 				</a>
 			</div>
+
+			{loading && (
+				<div className="text-center text-gray-500 mb-3">Memuat agenda...</div>
+			)}
+
+			{error && !loading && (
+				<div className="text-center text-red-500 mb-3">{error}</div>
+			)}
 
 			<div className="mb-4 flex justify-between items-center">
 				<button

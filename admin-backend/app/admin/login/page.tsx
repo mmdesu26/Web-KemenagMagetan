@@ -10,7 +10,7 @@ import { FaUser, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "rea
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { validateAdminCredentials } from "@/lib/auth"
+import { apiClient } from "@/lib/api-client"
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("")
@@ -26,27 +26,32 @@ export default function AdminLogin() {
     setLoading(true)
     setError("")
 
-    // Simulate API call delay with loading animation
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    const validUser = validateAdminCredentials(username, password)
-
-    if (validUser) {
-      setSuccess(true)
-      // Store admin session
-      localStorage.setItem("adminAuth", JSON.stringify(validUser))
-
-      // Delay for success animation
-      setTimeout(() => {
-        router.push("/admin/dashboard")
-      }, 1000)
-    } else {
-      setError("Username atau password salah, atau akun tidak aktif")
+    try {
+      const response = await apiClient.login(username, password)
+      if (response.success && response.data) {
+        const authPayload = {
+          username: response.data.admin.username,
+          loginTime: new Date().toISOString(),
+          role: response.data.admin.role,
+        }
+        localStorage.setItem("adminAuth", JSON.stringify(authPayload))
+        setSuccess(true)
+        setTimeout(() => {
+          router.push("/admin/dashboard")
+        }, 800)
+      } else {
+        setError("Username atau password salah")
+      }
+    } catch (err: any) {
+      console.error(err)
+      const errorMessage = err.message || "Gagal masuk, periksa koneksi atau kredensial Anda"
+      setError(errorMessage)
+    } finally {
       setLoading(false)
     }
   }
 
-   const containerVariants: Variants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
       opacity: 1,
@@ -247,11 +252,11 @@ export default function AdminLogin() {
                 <div className="space-y-1">
                   <p>
                     <span className="font-mono bg-white px-2 py-1 rounded">admin</span> /{" "}
-                    <span className="font-mono bg-white px-2 py-1 rounded">admin123</span>
+                    <span className="font-mono bg-white px-2 py-1 rounded">Admin123!</span>
                   </p>
                   <p>
                     <span className="font-mono bg-white px-2 py-1 rounded">superadmin</span> /{" "}
-                    <span className="font-mono bg-white px-2 py-1 rounded">super123</span>
+                    <span className="font-mono bg-white px-2 py-1 rounded">Superadmin123!</span>
                   </p>
                 </div>
               </motion.div>
