@@ -52,11 +52,14 @@ import InfoBantuan from './components/InfoBantuan/page.jsx';
 import FAQ from './components/FAQ/page.jsx'; 
 import SOP from './components/Layanan/SOP/page.jsx'; 
 import SPM from './components/Layanan/SPM/page.jsx';
+import StandarPelayanan from './components/Layanan/StandarPelayanan/page.jsx';
 import DataKemenagMagetan from './components/PPID/DataKemenagMagetan/page.jsx';
 import InformasiBerkala from './components/PPID/InformasiBerkala/page.jsx';
 import InformasiSertaMerta from './components/PPID/InformasiSertaMerta/page.jsx';
 import InformasiSetiapSaat from './components/PPID/InformasiSetiapSaat/page.jsx';
-import TugasPPID from './components/PPID/TugasPPID/page.jsx';
+import TugasPPID from './components/PPID/Tugas/page.jsx';
+
+import Footer from './components/layout/Footer';
 
 // Komponen pembungkus agar AnimatePresence bisa membaca perubahan lokasi
 function AnimatedRoutes() {
@@ -76,12 +79,11 @@ function AnimatedRoutes() {
         <Route path="/Layanan/standar" element={<StandarPelayanan />} />
         <Route path="/Layanan/SOP" element={<SOP/>} />
         <Route path="/Layanan/SPM" element={<SPM/>} />
-        <Route path="/page" element={<TARGET_URL/>} />
         <Route path="/PPID/DataKemenagMagetan" element={<DataKemenagMagetan/>} />
         <Route path="/PPID/InformasiBerkala" element={<InformasiBerkala/>} />
         <Route path="/PPID/InformasiSertaMerta" element={<InformasiSertaMerta/>} />
         <Route path="/PPID/InformasiSetiapSaat" element={<InformasiSetiapSaat/>} />
-        <Route path="/PPID/TugasPPID" element={<TugasPPID/>} />
+        <Route path="/PPID/Tugas" element={<TugasPPID/>} />
         {/* tambahkan route lain di sini bila perlu */}
       </Routes>
     </AnimatePresence>

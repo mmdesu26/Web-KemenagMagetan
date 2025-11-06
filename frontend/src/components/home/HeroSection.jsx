@@ -35,7 +35,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-   <section className="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 text-white pt-24 pb-12 sm:pt-28 sm:pb-16 md:pt-32 md:pb-22 overflow-hidden">
+<section className="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 text-white pt-8 pb-12 sm:pt-12 sm:pb-16 md:pt-29 md:pb-20 overflow-hidden">
       {/* === Corak Bambu === */}
       <div
         className="absolute inset-0 bg-[url('/assets/images/bambuu.png')] 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Header from "../../components/layout/Header";
-import Footer from "../../components/layout/Footer";
 import HeroSection from "../../components/home/HeroSection";
 import Services from "../../components/home/Services";
 import Articles from "../../components/home/Articles";
@@ -104,7 +103,6 @@ const Home = () => {
 				)}
 			</main>
 
-			<Footer />
 		</div>
 	);
 };
