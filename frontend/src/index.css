@@ -82,3 +82,7 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-green-700;
 }
+
+html, body {
+  overflow-x: hidden;
+}
