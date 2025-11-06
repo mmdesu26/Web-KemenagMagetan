@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { FaUser } from "react-icons/fa" // Import FaUser here
+import { FaUser } from "react-icons/fa" 
 
 import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
@@ -14,11 +14,11 @@ import {
   FaSignOutAlt,
   FaBars,
   FaTimes,
-  FaUpload,
   FaChevronRight,
 } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { getAdminAuth, logoutAdmin } from "@/lib/auth"
+import { apiClient } from "@/lib/api-client"
 
 interface AdminLayoutProps {
   children: React.ReactNode
@@ -35,12 +35,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Dashboard", icon: FaHome, path: "/admin/dashboard" },
     { name: "Kelola Menu", icon: FaList, path: "/admin/menus" },
     { name: "Kelola Berita", icon: FaNewspaper, path: "/admin/news" },
-    { name: "Upload File", icon: FaUpload, path: "/admin/uploads" },
     { name: "Kelola Admin", icon: FaUsers, path: "/admin/users" },
   ]
 
   const handleLogout = () => {
     logoutAdmin()
+    apiClient.logout()
     router.push("/admin/login")
   }
 

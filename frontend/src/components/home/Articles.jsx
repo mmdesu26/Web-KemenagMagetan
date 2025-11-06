@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { articles } from "../../data/articles";
 import { FaCalendarAlt, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
 const Articles = () => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const loadArticles = async () => {
+            try {
+                setLoading(true);
+                setError("");
+                const data = await apiClient.get("/public/articles", { limit: 6 });
+                setItems(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message || "Gagal memuat artikel");
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadArticles();
+    }, []);
+
+    const visibleArticles = items.slice(0, 3);
+
 	return (
 		<motion.section
 			initial={{ opacity: 0, y: 50 }}
@@ -22,8 +44,16 @@ const Articles = () => {
 				</a>
 			</div>
 
+			{loading && (
+				<div className="text-center text-gray-500">Memuat artikel...</div>
+			)}
+
+			{error && !loading && (
+				<div className="text-center text-red-500 mb-4">{error}</div>
+			)}
+
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-				{articles.slice(0, 3).map((article, index) => (
+				{!loading && visibleArticles.map((article, index) => (
 					<motion.article
 						key={article.id}
 						initial={{ opacity: 0, y: 20 }}
@@ -40,7 +70,7 @@ const Articles = () => {
 						<div className="p-6">
 							<div className="flex items-center text-gray-500 text-sm mb-2">
 								<FaCalendarAlt className="mr-2" />
-								{new Date(article.date).toLocaleDateString("id-ID", {
+							{new Date(article.date || article.publishedAt).toLocaleDateString("id-ID", {
 									day: "numeric",
 									month: "long",
 									year: "numeric",

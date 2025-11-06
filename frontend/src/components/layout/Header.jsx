@@ -276,11 +276,8 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-  FaSearch,
   FaBars,
   FaTimes,
-  FaPhone,
-  FaEnvelope,
   FaFacebook,
   FaInstagram,
   FaYoutube,
@@ -291,11 +288,13 @@ import {
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
   const [isLayananDropdownOpen, setIsLayananDropdownOpen] = useState(false)
   const [isPTSPDropdownOpen, setIsPTSPDropdownOpen] = useState(false)
   const [isPPIDDropdownOpen, setIsPPIDDropdownOpen] = useState(false)
+
+  // state tambahan untuk mobile dropdown
+  const [openDropdown, setOpenDropdown] = useState(null)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50)
@@ -339,11 +338,11 @@ const Header = () => {
       name: "PPID",
       path: "/ppid",
       submenu: [
-        { name: "Data Kemenag Magetan", path: "/ppid/data-kemenag" },
+        { name: "Data Kemenag Magetan", path: "https://lookerstudio.google.com/u/0/reporting/544981f2-01e6-4046-bae0-58c759acc646/page/bZlSF" },
         { name: "Tugas PPID", path: "/ppid/tugas" },
-        { name: "Informasi Berkala", path: "/ppid/informasi-berkala" },
-        { name: "Informasi Serta Merta", path: "/ppid/informasi-serta-merta" },
-        { name: "Informasi Setiap Saat", path: "/ppid/informasi-setiap-saat" },
+        { name: "Informasi Berkala", path: "/ppid/informasiberkala" },
+        { name: "Informasi Serta Merta", path: "/ppid/informasisertamerta" },
+        { name: "Informasi Setiap Saat", path: "/ppid/informasisetiapsaat" },
       ],
     },
     { name: "FAQ", path: "/faq" },
@@ -362,58 +361,34 @@ const Header = () => {
         scrolled ? "bg-white shadow-md py-2" : "bg-white/90 py-4"
       }`}
     >
-      <div className="container mx-auto px-4">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center mb-2">
-          <div className="flex items-center">
-            <img src="/assets/images/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
-            <div>
-              <h1 className="text-lg font-bold text-green-800">KEMENTERIAN AGAMA</h1>
-              <p className="text-sm text-gray-600">Kabupaten Magetan</p>
-            </div>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center text-green-700">
-              <FaPhone className="mr-2" />
-              <span>(0351) 1234567</span>
-            </div>
-            <div className="flex items-center text-green-700">
-              <FaEnvelope className="mr-2" />
-              <span>kemenag@magetan.go.id</span>
-            </div>
+      <div className="container mx-auto px-4 flex justify-between items-center">
+        {/* Logo kiri */}
+        <div className="flex items-center">
+          <img src="/assets/images/logo.png" alt="Kemenag Magetan" className="h-12 mr-3" />
+          <div>
+            <h1 className="text-lg font-bold text-green-800">KEMENTERIAN AGAMA</h1>
+            <p className="text-sm text-gray-600">Kabupaten Magetan</p>
           </div>
         </div>
 
-        {/* Main Navigation */}
-        <div className="flex justify-between items-center border-t border-gray-200 pt-2">
+        {/* Menu kanan */}
+        <div className="flex items-center">
           <nav className="hidden md:flex space-x-6">
             {menuItems.map((item, index) => (
               <div key={index} className="relative">
                 {item.submenu ? (
                   <div
-                    className="relative"
                     onMouseEnter={() => {
-                      if (item.name === "Profil") {
-                        setIsProfileDropdownOpen(true)
-                      } else if (item.name === "Layanan") {
-                        setIsLayananDropdownOpen(true)
-                      } else if (item.name === "PTSP") {
-                        setIsPTSPDropdownOpen(true)
-                      } else if (item.name === "PPID") {
-                        setIsPPIDDropdownOpen(true)
-                      }
+                      if (item.name === "Profil") setIsProfileDropdownOpen(true)
+                      if (item.name === "Layanan") setIsLayananDropdownOpen(true)
+                      if (item.name === "PTSP") setIsPTSPDropdownOpen(true)
+                      if (item.name === "PPID") setIsPPIDDropdownOpen(true)
                     }}
                     onMouseLeave={() => {
-                      if (item.name === "Profil") {
-                        setIsProfileDropdownOpen(false)
-                      } else if (item.name === "Layanan") {
-                        setIsLayananDropdownOpen(false)
-                      } else if (item.name === "PTSP") {
-                        setIsPTSPDropdownOpen(false)
-                      } else if (item.name === "PPID") {
-                        setIsPPIDDropdownOpen(false)
-                      }
+                      if (item.name === "Profil") setIsProfileDropdownOpen(false)
+                      if (item.name === "Layanan") setIsLayananDropdownOpen(false)
+                      if (item.name === "PTSP") setIsPTSPDropdownOpen(false)
+                      if (item.name === "PPID") setIsPPIDDropdownOpen(false)
                     }}
                   >
                     <button className="flex items-center text-green-800 hover:text-green-600 font-medium transition-colors">
@@ -455,57 +430,52 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="flex items-center space-x-4">
-            <div className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Cari..."
-                className="border border-gray-300 rounded-full py-1 px-4 pl-10 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <FaSearch className="absolute left-3 top-2 text-gray-400" />
-            </div>
-
-            <button className="md:hidden text-green-800" onClick={() => setIsOpen(!isOpen)}>
-              {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
-          </div>
+          {/* Tombol hamburger untuk mobile */}
+          <button className="md:hidden text-green-800 ml-4" onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="md:hidden bg-white shadow-lg rounded-b-lg overflow-hidden"
-          >
-            <div className="p-4">
-              <div className="relative mb-4">
-                <input
-                  type="text"
-                  placeholder="Cari..."
-                  className="border border-gray-300 rounded-full py-2 px-4 pl-10 w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <FaSearch className="absolute left-3 top-3 text-gray-400" />
-              </div>
+      {/* Mobile Menu */}
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+          className="md:hidden bg-white shadow-lg rounded-b-lg overflow-hidden"
+        >
+          <div className="p-4">
+            <nav className="flex flex-col space-y-3">
+              {menuItems.map((item, index) => {
+                const hasSubmenu = !!item.submenu
+                const isDropdownOpen = openDropdown === index
 
-              <nav className="flex flex-col space-y-3">
-                {menuItems.map((item, index) => (
+                return (
                   <div key={index}>
-                    <a
-                      href={item.path}
-                      className="text-green-800 hover:text-green-600 font-medium py-2 border-b border-gray-100 flex items-center justify-between"
-                      onClick={() => setIsOpen(false)}
+                    <button
+                      onClick={() => {
+                        if (hasSubmenu) {
+                          setOpenDropdown(isDropdownOpen ? null : index)
+                        } else {
+                          setIsOpen(false)
+                          window.location.href = item.path
+                        }
+                      }}
+                      className="w-full flex items-center justify-between text-green-800 hover:text-green-600 font-medium py-2 border-b border-gray-100"
                     >
                       {item.name}
-                      {item.submenu && <FaChevronDown className="text-xs" />}
-                    </a>
-                    {item.submenu && (
+                      {hasSubmenu && (
+                        <FaChevronDown
+                          className={`ml-2 text-xs transform transition-transform ${
+                            isDropdownOpen ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      )}
+                    </button>
+
+                    {hasSubmenu && isDropdownOpen && (
                       <div className="ml-4 mt-2 space-y-2">
                         {item.submenu.map((subItem, subIndex) => (
                           <a
@@ -520,28 +490,30 @@ const Header = () => {
                       </div>
                     )}
                   </div>
-                ))}
-              </nav>
+                )
+              })}
+            </nav>
 
-              <div className="flex justify-center space-x-4 mt-4 pt-4 border-t border-gray-200">
-                {socialLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-green-700 hover:text-green-500 text-xl"
-                  >
-                    {link.icon}
-                  </a>
-                ))}
-              </div>
+            {/* Social media di bawah menu mobile */}
+            <div className="flex justify-center space-x-4 mt-4 pt-4 border-t border-gray-200">
+              {socialLinks.map((link, index) => (
+                <a
+                  key={index}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-700 hover:text-green-500 text-xl"
+                >
+                  {link.icon}
+                </a>
+              ))}
             </div>
-          </motion.div>
-        )}
-      </div>
+          </div>
+        </motion.div>
+      )}
     </header>
   )
 }
 
 export default Header
+

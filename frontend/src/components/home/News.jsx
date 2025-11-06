@@ -1,12 +1,31 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { news } from "../../data/news";
 import { FaCalendarAlt, FaFilter, FaArrowRight } from "react-icons/fa";
+import { apiClient } from "../../api/client";
 
-const News = ({ category, title, isMobile }) => {
+const News = ({ category, title, isMobile, limit = 4 }) => {
 	const [sortBy, setSortBy] = useState("newest");
 	const [selectedDate, setSelectedDate] = useState(null);
 	const inputRef = useRef(null);
+	const [items, setItems] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
+
+	useEffect(() => {
+		const loadNews = async () => {
+			try {
+				setLoading(true);
+				setError("");
+				const data = await apiClient.get("/public/news", { category, limit: 20 });
+				setItems(Array.isArray(data) ? data : []);
+			} catch (err) {
+				setError(err.message || "Gagal memuat berita");
+			} finally {
+				setLoading(false);
+			}
+		};
+		loadNews();
+	}, [category]);
 
 	const handleButtonClick = () => {
 		if (inputRef.current) {
@@ -18,8 +37,7 @@ const News = ({ category, title, isMobile }) => {
 		}
 	};
 
-	const filteredNews = news
-		.filter((item) => item.category === category)
+	const filteredNews = [...items]
 		.sort((a, b) => {
 			if (sortBy === "newest") {
 				return new Date(b.date) - new Date(a.date);
@@ -85,26 +103,36 @@ const News = ({ category, title, isMobile }) => {
 					</div>
 
 					<a
-						href={`/news?category=${category}`}
-						className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex items-center"
-					>
-						Lihat <FaArrowRight className="ml-1 hidden md:inline" />
-					</a>
+  href={`/berita?category=${category}`}
+  className="text-green-600 hover:text-green-800 text-xs md:text-sm font-medium flex items-center"
+>
+  Lihat <FaArrowRight className="ml-1 hidden md:inline" />
+</a>
+
 				</div>
 			</div>
 
-			<div className="space-y-3 md:space-y-4">
-				{filteredNews.slice(0, isMobile ? 2 : 3).map((item, index) => (
+		{loading && (
+			<div className="text-center text-gray-500 py-4">Memuat berita...</div>
+		)}
+
+		{error && !loading && (
+			<div className="text-center text-red-500 py-4">{error}</div>
+		)}
+
+		<div className="space-y-3 md:space-y-4">
+			{!loading && filteredNews.slice(0, limit).map((item, index) => (
 					<motion.article
-						key={item.id}
-						initial={{ opacity: 0, y: 20 }}
-						whileInView={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.3, delay: index * 0.1 }}
-						whileHover={{ x: isMobile ? 0 : 5 }}
-						className={`flex ${
-							isMobile ? "flex-col" : "flex-row"
-						} gap-3 md:gap-4 p-3 md:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors`}
-					>
+  key={item.id}
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3, delay: index * 0.1 }}
+  whileHover={{ x: isMobile ? 0 : 4 }}
+  className={`news-card flex ${
+    isMobile ? "flex-col" : "flex-row"
+  } gap-3 md:gap-4 p-3 md:p-4 border border-gray-200 rounded-lg`}
+>
+
 						<img
 							src={item.image}
 							alt={item.title}
@@ -135,7 +163,7 @@ const News = ({ category, title, isMobile }) => {
 				))}
 			</div>
 
-			{filteredNews.length === 0 && (
+		{!loading && filteredNews.length === 0 && !error && (
 				<div className="text-center py-4 md:py-8 text-gray-500 text-sm md:text-base">
 					Tidak ada berita yang ditemukan untuk kriteria yang dipilih.
 				</div>

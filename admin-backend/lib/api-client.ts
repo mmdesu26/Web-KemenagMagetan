@@ -3,7 +3,8 @@ class ApiClient {
   private token: string | null
 
   constructor() {
-    this.baseUrl = "/api"
+    const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api"
+    this.baseUrl = `${base.replace(/\/$/, "")}/admin`
     this.token = null
   }
 
@@ -25,9 +26,11 @@ class ApiClient {
     const url = `${this.baseUrl}${endpoint}`
     const token = this.getToken()
 
+    const isFormData = options.body instanceof FormData
+
     const config: RequestInit = {
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
@@ -39,7 +42,7 @@ class ApiClient {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || "API request failed")
+        throw new Error(data.message || data.error || "API request failed")
       }
 
       return data
@@ -56,8 +59,8 @@ class ApiClient {
       body: JSON.stringify({ username, password }),
     })
 
-    if (response.success && response.token) {
-      this.setToken(response.token)
+    if (response.success && response.data?.token) {
+      this.setToken(response.data.token)
     }
 
     return response
@@ -83,16 +86,14 @@ class ApiClient {
   }
 
   async updateMenu(id: number, menuData: any) {
-    return this.request("/menus", {
+    return this.request(`/menus/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...menuData }),
+      body: JSON.stringify(menuData),
     })
   }
 
   async deleteMenu(id: number) {
-    return this.request(`/menus?id=${id}`, {
-      method: "DELETE",
-    })
+    return this.request(`/menus/${id}`, { method: "DELETE" })
   }
 
   // News methods
@@ -115,16 +116,14 @@ class ApiClient {
   }
 
   async updateNews(id: number, newsData: any) {
-    return this.request("/news", {
+    return this.request(`/news/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...newsData }),
+      body: JSON.stringify(newsData),
     })
   }
 
   async deleteNews(id: number) {
-    return this.request(`/news?id=${id}`, {
-      method: "DELETE",
-    })
+    return this.request(`/news/${id}`, { method: "DELETE" })
   }
 
   // Upload methods
@@ -132,21 +131,20 @@ class ApiClient {
     return this.request("/uploads")
   }
 
-  async uploadFile(file: File) {
+  async uploadFiles(files: FileList | File[]) {
     const formData = new FormData()
-    formData.append("file", file)
+    Array.from(files).forEach((file) => {
+      formData.append("files", file)
+    })
 
     return this.request("/uploads", {
       method: "POST",
       body: formData,
-      headers: {}, // Remove Content-Type to let browser set it for FormData
     })
   }
 
   async deleteUpload(id: number) {
-    return this.request(`/uploads?id=${id}`, {
-      method: "DELETE",
-    })
+    return this.request(`/uploads/${id}`, { method: "DELETE" })
   }
 
   // User methods
@@ -162,15 +160,20 @@ class ApiClient {
   }
 
   async updateUser(id: number, userData: any) {
-    return this.request("/users", {
+    return this.request(`/users/${id}`, {
       method: "PUT",
-      body: JSON.stringify({ id, ...userData }),
+      body: JSON.stringify(userData),
     })
   }
 
   async deleteUser(id: number) {
-    return this.request(`/users?id=${id}`, {
-      method: "DELETE",
+    return this.request(`/users/${id}`, { method: "DELETE" })
+  }
+
+  async updateUserPassword(id: number, password: string) {
+    return this.request(`/users/${id}/password`, {
+      method: "PATCH",
+      body: JSON.stringify({ password }),
     })
   }
 }
