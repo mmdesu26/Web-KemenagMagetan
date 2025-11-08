@@ -1,320 +1,289 @@
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { FaChevronDown, FaSearch, FaQuestionCircle, FaFileAlt, FaUsers, FaHeart } from "react-icons/fa"
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  FaChevronDown,
+  FaSearch,
+  FaQuestionCircle,
+  FaFileAlt,
+  FaUsers,
+  FaGraduationCap,
+} from "react-icons/fa";
 
 const categories = [
-  { key: "all", label: "Semua", color: "bg-green-600", icon: FaQuestionCircle },
-  { key: "bimas", label: "Bimas Islam", color: "bg-green-700", icon: FaHeart },
-  { key: "haji", label: "Haji dan Umrah", color: "bg-yellow-600", icon: FaUsers },
-  { key: "nikah", label: "Nikah", color: "bg-green-500", icon: FaHeart },
-  { key: "pendidikan", label: "Pendidikan", color: "bg-yellow-700", icon: FaFileAlt },
-]
+  { key: "all", label: "Semua", color: "bg-green-700", icon: FaQuestionCircle },
+  { key: "bimas", label: "Bimas Islam", color: "bg-green-600", icon: FaUsers },
+  { key: "haji", label: "Haji & Umrah", color: "bg-amber-500", icon: FaGraduationCap },
+  { key: "nikah", label: "Nikah", color: "bg-green-500", icon: FaFileAlt },
+  { key: "pendidikan", label: "Pendidikan", color: "bg-amber-600", icon: FaGraduationCap },
+];
 
 const faqData = [
   {
     category: "bimas",
     question: "Bagaimana cara mengajukan permohonan Pembaca Doa?",
     answer:
-      "Untuk mengajukan permohonan pembaca doa, Anda perlu: 1) Mengisi formulir permohonan yang tersedia di kantor Kemenag, 2) Melampirkan fotokopi KTP dan KK, 3) Menyertakan surat keterangan dari RT/RW, 4) Menyerahkan berkas ke bagian Bimas Islam. Proses persetujuan memakan waktu 3-5 hari kerja.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan",
   },
   {
     category: "bimas",
-    question: "Bagaimana cara Permohonan Rohaniwan?",
+    question: "Bagaimana Permohonan Rohaniwan?",
     answer:
-      "Permohonan rohaniwan dapat dilakukan dengan: 1) Mengajukan surat permohonan resmi dari instansi/lembaga, 2) Melampirkan data lengkap acara (waktu, tempat, jenis kegiatan), 3) Menyertakan kontak person yang dapat dihubungi, 4) Mengajukan minimal 7 hari sebelum acara.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan",
   },
   {
     category: "bimas",
     question: "Bagaimana cara mengajukan permohonan Pengukuran Arah Kiblat?",
     answer:
-      "Untuk pengukuran arah kiblat: 1) Ajukan permohonan tertulis ke Kemenag, 2) Sertakan alamat lengkap lokasi masjid/musholla, 3) Koordinat GPS jika tersedia, 4) Kontak person penanggungjawab, 5) Tim akan melakukan survei dan pengukuran di lokasi.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Pengukuran Arah Kiblat\n2. Surat pernyataan Persetujuan dan Belum Pernah Mendapatkan Pengukuran Arah kiblat dari pihak lain\n3. Denah Lokasi masjid atau makam yang akan diukur Arah Kiblatnya",
   },
   {
     category: "bimas",
     question: "Bagaimana cara mengajukan permohonan data tempat ibadah?",
     answer:
-      "Untuk mendapatkan data tempat ibadah: 1) Ajukan surat permohonan resmi, 2) Sebutkan tujuan penggunaan data, 3) Lampirkan identitas pemohon, 4) Data akan diberikan sesuai ketentuan yang berlaku dan keperluan yang sah.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan",
   },
   {
     category: "bimas",
     question: "Bagaimana cara mengajukan permohonan Rekomendasi Izin Pendirian Tempat Ibadah?",
     answer:
-      "Persyaratan rekomendasi izin pendirian tempat ibadah: 1) Surat permohonan dari pengurus, 2) Akta notaris pendirian yayasan/organisasi, 3) Surat dukungan dari masyarakat sekitar, 4) Surat keterangan dari RT/RW dan Kelurahan, 5) Denah lokasi dan rencana bangunan, 6) NPWP yayasan.",
+      "Datang ke PTSP (Pelayanan Terpadu Satu Pintu) Kementerian Agama Kab. Magetan, dengan membawa:\n\n1. Fotokopi KTP Pemohon\n2. Surat Kuasa dan FC KTP penerima kuasa, apabila pengurusan diwakilkan\n3. Fotokopi Sertifikat Tanah\n4. Surat pernyataan kerelaan tanah, apabila rumah ibadah berdiri di atas tanah milik orang lain\n5. Surat pernyataan sanggup membuat peresapan air hujan\n6. Gambar teknis (tampak bangunan, potongan, pondasi, atap, sanitasi) atau foto bangunan (tampak depan, samping kanan, samping kiri, belakang)\n7. Surat pernyataan sanggup mengurus perubahan peruntukan tanah, apabila rumah ibadah berdiri diatas tanah yang berstatus tanah sawah atau tegalan",
   },
   {
     category: "haji",
     question: "Bagaimana cara mengajukan permohonan Rekomendasi Pembatalan Pemberangkatan Ibadah Haji?",
     answer:
-      "Untuk pembatalan pemberangkatan haji: 1) Surat permohonan pembatalan dengan alasan yang jelas, 2) Surat keterangan dokter (jika karena sakit), 3) Fotokopi buku tabungan haji, 4) Fotokopi KTP dan KK, 5) Surat pernyataan bermaterai. Proses pembatalan akan dikoordinasikan dengan Kemenag Pusat.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Pembatalan Haji ditujukan kepada kepala kankemenag Kab. Magetan cq Seksi PHU\n2. Surat Kematian yang dikeluarkan oleh lurah/kepala desa/rumah sakit setempat\n3. Surat keterangan waris bermaterai Rp 6000 yang dikeluarkan oleh Lurah/Kepala desa dan diketahui oleh camat\n4. Surat Keterangan Kuasa Waris yang ditunjuk ahli waris untuk melakukan pembatalan pendaftaran jamaah haji bermaterai Rp.6000\n5. Fotokopi KTP Ahli Waris/Kuasa Waris jamaah haji yang mengajukan pembatalan pendaftaran jemaah haji dan memperlihat aslinya\n6. Surat Pernyataan Tanggung Jawab Mutlak dari ahli waris/kuasa waris jemaah haji, bermaterai Rp.6000\n7. Bukti asli setoran awal Biaya Perjalanan Ibadah Haji (BPIH) yang dikeluarkan Bank Penerima Setoran Biaya Perjalanan Ibadah Haji (BPS BPIH)\n8. Asli Aplikasi transfer setoran awal Biaya Perjalanan ibadah Haji (BPIH) ke rekening Menteri Agama\n9. SPPH (Surat Pendaftaran Pergi Haji)\n10. Fotokopi buku tabungan yang masih aktif atas nama jemaah haji yang bersangkutan dan memperlihatkan aslinya\n11. Fotokopi buku tabungan ahli waris/pemohon di bank yang sama dan memperlihatkan aslinya\n12. Semua persyaratan difotokopi rangkap 2 dan dikumpul beserta yang asli",
   },
   {
     category: "haji",
     question: "Bagaimana cara mengajukan permohonan rekomendasi perpanjangan izin operasional PPIU?",
     answer:
-      "Perpanjangan izin PPIU memerlukan: 1) Surat permohonan perpanjangan, 2) Fotokopi izin operasional yang akan habis, 3) Laporan kegiatan tahun sebelumnya, 4) Laporan keuangan, 5) Daftar jamaah yang telah dilayani, 6) Sertifikat kompetensi SDM yang masih berlaku.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Rekomendasi ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan yang ditandatangani oleh direktur utama dan stempel perusahaan dengan dilampiri persyaratan\n2. Fotokopi Akta Notaris Pendirian perseroan terbatas (Bagi akta pendirian yang lebih dari 5 Tahun belum ada perubahan harus ada perubahan dan pemilik akta PT adalah WNI beragama Islam agar dilampirkan KTP\n3. Fotokopi Surat Pengesahan Akta Notaris dari Kementerian Hukum dan HAM\n4. Fotokopi Izin Usaha biro perjalanan wisata dari Dinas Pariwisata setempat sudah beroperasi paling singkat 2 Tahun dibuktikan dengan Tanda Daftar Usaha Pariwisata (TUDP)\n5. Fotokopi Surat Keterangan Domisili usaha (SKDU) dari Pemda setempat (desa/kelurahan/kecamatan) yang masih berlaku\n6. Fotokopi Surat keterangan terdaftar sebagai wajib pajak dari Direktorat Jenderal Pajak\n7. Surat Rekomendasi dari Kantor Kementerian Agama Kab. Magetan\n8. Fotokopi Surat Rekomendasi dari Instansi Pemda Provinsi dan atau/ kabupaten/kota setempat yang membidangi pariwisata yang masih berlaku\n9. Fotokopi Laporan keuangan perusahaan 1 tahun terakhir dan telah diaudit akuntan publik yang terdaftar di kementerian keuangan dengan WDP\n10. Susunan dan struktur pengurus perusahaan ditandatangani oleh direktur uatama dan stempel perusahaan (asli)\n11. Fotokopi Kartu Tanda Penduduk (KTP dan Biodata pemegang saham dan anggota direksi dan komisaris (semua WNI beragama islam)\n12. Fotokopi NPWP atas nama perusahaan dan pimpinan perusahaan\n13. Memiliki sumber daya manusia berpengalaman di bidang Biro Perjalanan Wisata/BPW (minimal 3 orang)\n14. Memiliki kantor domisili tetap dan atau sewa minimal 3 tahun dan dilengkapi sarana prasarana yang mendukung manajemen operasional (ruang minimal 60 m2)\n15. Memiliki Mitra biro penyelenggaraan ibadah umrah di arab saudi yang mempunyai izin resmi dari pemerintah kerajaan arab saudi\n16. Fotokopi sertifikat keangggotaan ASITA\n17. Foto Foto kondisi muka kantor dan ruang pelayanan serta kegiatan bimbingan umrah\n18. Laporan Pelaksanaan Penyelenggaraan Ibadah Umrah 2 Tahun terakhir yang dibuktikan dengan daftar jemaah yang telah mengikutinya (terdaftar di Penyelenggara Perjalanan Ibadah Umrah/PPIUnya)\n19. Bukti telah memberangkatan jemaah umrah minimal 200 orang selama 3 tahun\n20. Hasil Akreditasi Penyelenggara Perjalanan Ibadah Umroh (PPIU) minimal B\n21. Surat Keputusan Penetapan sebagai Penyelenggara Perjalanan Ibadah Umrah (PPIU)/izin operasional Penyelenggara Perjalanan Ibadah Umroh (PPIU) yang masih berlaku",
   },
   {
     category: "haji",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi Izin Pendirian Operasional PPIU?",
+    question: "Bagaimana cara mengajukan permohonan rekomendasi Izin Pendirian Operasional Penyelenggara Perjalanan Ibadah Umrah (PPIU)?",
     answer:
-      "Untuk izin pendirian PPIU baru: 1) Surat permohonan dari direksi perusahaan, 2) Akta pendirian perusahaan, 3) NPWP dan SIUP, 4) Sertifikat kompetensi penyelenggara umrah, 5) Rencana kerja dan anggaran, 6) Surat pernyataan kesanggupan, 7) Jaminan bank sesuai ketentuan.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Rekomendasi ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan yang ditandatangani oleh direktur utama dan stempel\n2. Fotokopi Akta Notaris Pendirian perseroan terbatas (Bagi akta pendirian yang lebih dari 5 Tahun belum ada perubahan harus ada perubahan dan pemilik akta PT adalah WNI beragama Islam agar dilampirkan KTP\n3. Fotokopi Surat Pengesahan akta Notaris dari Kementerian Hukum dan HAM\n4. Fotokopi Izin Usaha biro perjalanan wisata dari Dinas Pariwisata setempat sudah beroperasi paling singkat 2 Tahun dibuktikan dengan Tanda Daftar Usaha Pariwisata (TUDP)\n5. Fotokopi Surat Keterangan Domisili Usaha (SKDU) dari Pemda setempat (desa/kelurahan/kecamatan) yang masih berlaku\n6. Fotokopi Surat keterngan terdaftar sebagai wajib pajak dari Direktorat Jenderal Pajak\n7. Surat Rekomendasi dari Kantor Kementerian Agama Kab. Magetan\n8. Fotokopi Surat Rekomendasi dari Instansi Pemda Provinsi dan atau/ kabupaten/kota setempat yang membidangi pariwisata yang masih berlaku\n9. Fotokopi Laporan keuangan perusahaan 1 tahun terakhir dan telah diaudit akuntan publik yang terdaftar di kementerian keuangan dengan WDP\n10. Susunan dan struktur pengurus perusahaan ditandatangani oleh direktur utama dan stempel perusahaan (asli)\n11. Fotokopi Kartu Tanda Penduduk (KTP dan Biodata pemegang saham dan anggota direksi dan komisaris (semua WNI beragama islam)\n12. Fotokopi NPWP atas nama perusahaan dan pimpinan perusahaan\n13. Memiliki sumber daya manusia berpengalaman di bidang BPW (minimal 3 orang)\n14. Memiliki kantor domisili tetap dan atau sewa minimal 3 tahun dan dilengkapi sarana prasarana yang mendukung manajemen operasional (ruang minimal 60 m2)\n15. Memiliki Mitra biro penyelenggaraan ibadah umrah di arab saudi yang mempunyai izin resmi dari pemerintah kerajaan arab saudi\n16. Fotokopi sertifikat keanggotaan ASITA\n17. Foto Foto kondisi muka kantor dan ruang pelayanan serta kegiatan bimbingan umrah",
   },
   {
     category: "nikah",
     question: "Bagaimana cara mengajukan permohonan data pernikahan?",
     answer:
-      "Untuk mendapatkan data pernikahan: 1) Surat permohonan resmi, 2) Fotokopi KTP pemohon, 3) Sebutkan tujuan penggunaan data, 4) Jika untuk keperluan hukum, sertakan surat kuasa jika diperlukan, 5) Data akan diberikan sesuai ketentuan privasi yang berlaku.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan",
   },
   {
     category: "nikah",
     question: "Bagaimana cara mengajukan Surat Permohonan Wali Hakim?",
     answer:
-      "Permohonan wali hakim diperlukan jika: 1) Wali nasab tidak ada/tidak bisa hadir, 2) Ajukan surat permohonan ke KUA, 3) Lampirkan fotokopi KTP calon pengantin, 4) Surat keterangan tidak ada wali dari kelurahan, 5) Surat pernyataan dari calon pengantin wanita, 6) Proses akan dilakukan oleh Penghulu KUA.",
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Wali Hakim ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan",
   },
   {
     category: "pendidikan",
     question: "Bagaimana cara mengajukan permohonan izin pendirian TPA/TQA?",
     answer:
-      "Persyaratan pendirian TPA/TQA: 1) Surat permohonan dari pengurus, 2) Akta notaris yayasan/organisasi, 3) Daftar pengurus dan tenaga pengajar, 4) Kurikulum pembelajaran, 5) Denah lokasi dan fasilitas, 6) Surat dukungan masyarakat, 7) Rekomendasi dari MUI setempat.",
+     "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Mengajukan Proposal Pendirian TPA/TQA sebagai berikut : Surat Permohonan yang diketahui oleh RT/Kepala dusun, Kepala Desa, Kepala KUA, Camat Setempat\n2. Visi dan Misi\n3. Susunan Pengurus\n4. Kurikulum Pelajaran\n5. Jadwal Pelajaran\n6. Daftar guru pengajar\n7. Daftar Santri\n8. Sarana prasarana yang dimiliki\n9. Foto gedung dan kegiatan (Jika memungkinkan)\n10. Memiliki Guru Minimal 2 Orang\n11. Santri minimal 10 anak aktif\n12. Tempat atau ruang belajar yang memadai\n13. Ada mata pelajaran Alquran dan Hadist, Kisah Islami (Para nabi dan sahabat), Hafalan surat, Hafalan Doa‐doa,Hafalan Ayat‐Ayat, Menulis Arab, Aqidah, Akhlaq, Praktek Ibadah\n14. Pembelajaran sebanyak 10 dalam setiap minggu"
   },
   {
     category: "pendidikan",
     question: "Bagaimana cara mengajukan Izin Pendirian Pondok Pesantren?",
-    answer:
-      "Pendirian pondok pesantren memerlukan: 1) Surat permohonan dari calon pimpinan pesantren, 2) Akta notaris yayasan, 3) Riwayat hidup dan ijazah pimpinan pesantren, 4) Rencana kurikulum dan program pendidikan, 5) Sertifikat tanah dan bangunan, 6) Struktur organisasi, 7) Rekomendasi ulama setempat.",
+    answer: 
+      "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Memiliki Kelengkapan 5 unsur yakni memiliki : Kyai, Tuan Guru, Gurutta/anre gurutta, inyiak, syekh, ustad atau sebutan lain sesuai kekhasan wilayah masing-masing sebagai figur teladan/atau sekaligus pengasuh yang dipersyaratan wajib berpendidikan pondok pesantren\n2. Santri yang mukim di pesantren minimal 15 orang\n3. Pondok atau asrama\n4. Masjid, musholla\n5. Kajian kitab kuning yang berkelanjutan (kurikulum pondok)\n6. Mengembangkan Jiwa atau Karasteristik pesantren terutama aspek jiwa NKRI dan nasionalisme, menjujung tinggi niliai‐nilai keindonesiaan, kebangsaan, kenegaraan dan persatuan yang didasarkan atas NKRI, Pancasila, UUD 1945\n7. Memiliki Legalitas hukum yang sah baik berupa yayasan atau lainnya yang dibuktikan dengan akta notaris dan NPWP yang masih berlaku\n8. Memiliki bukti kepemilikan tanah milik atau wakaf yang sah atas nama yayasan atau lembaga yang mengusulkan izin operasional\n9. Memiliki susunan pengurus yayasan/lembaga yang cukup\n10. Memiliki surat keterangan domisili dari kantor kelurahan/desa setempat\n11. Mendapat surat rekomendasi izin operasional dari kantor urusan agama (KUA) setempat\n12. Mengisi formulir yang telah disediakan\n13. Mengajukan surat permohonan izin operasional kepada kepala Kemenag Kab. Magetan\n14. Surat Permohonan (Proposal) dibuat rangkap 2 (dua) ditujukan Kepada Kepala Kantor Kementerian Agama Kan.Kemenag Kab. Magetan dan Kepada Ketua FKPP (Forum Komunikasi Pondok Pesantren)",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan izin pendirian madrasah diniyah?",
-    answer:
-      "Izin pendirian madrasah diniyah: 1) Surat permohonan dari yayasan, 2) Akta notaris dan NPWP yayasan, 3) Daftar tenaga pendidik dan kualifikasinya, 4) Kurikulum sesuai standar Kemenag, 5) Sarana dan prasarana pembelajaran, 6) Rencana pembiayaan, 7) Surat dukungan masyarakat.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan izin pendirian madrasah diniyah?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Proposal, yang memuat :\n a. Surat Permohonan yang diketahui oleh RT/Kepala dusun, Kepala Desa, Kepala KUA, Camat setempat\n b. Visi dan Misi\n c. Susunan Pengurus\n d. Kurikulum Pelajaran\n e. Jadwal Pelajaran\n f. Data guru pengajar\n g. Daftar Santri\n h. Sarana Prasarana yang dimiliki\n i. Foto Gedung dan Kegiatan (Jika Memungkinkan)\n2. Memiliki Guru minimal 2 orang\n3. Memiliki Santri minimal 10 anak aktif\n4. Memiliki Tempat atau ruang belajar yang memadai\n5. Ada Mata Pelajaran : Al quran dan Hadist, Sejarah Kebudayaan Islam, Ibadah, Figh, Bahasa Arab, Aqidah, akhlaq Praktek ibadah\n6. Pembelajaran sebanyak 18 jam dalam setiap minggu\n7. Surat Permohonan yang ditujukan kepada Kepala Kantor Kementerian Agama Kab. Magetan."
   },
   {
-    category: "pendidikan",
-    question:
-      "Bagaimana cara mengajukan rekomendasi santri pondok pesantren belajar/mondok Keluar Negeri (Paspor Pendidikan)?",
-    answer:
-      "Rekomendasi santri ke luar negeri: 1) Surat permohonan dari pimpinan pesantren, 2) Biodata lengkap santri, 3) Surat penerimaan dari lembaga pendidikan luar negeri, 4) Fotokopi ijazah terakhir, 5) Surat pernyataan orang tua/wali, 6) Rekomendasi dari pesantren asal, 7) Pas foto terbaru.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan rekomendasi santri pondok pesantren belajar/mondok Keluar Negeri (Paspor Pendidikan)?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan dari Pondok pesantren yang bersangkutan\n2. Fotokopi KTP Santri\n3. Fotokopi Ijazah PPS",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi santri luar negeri?",
-    answer:
-      "Untuk rekomendasi santri luar negeri: 1) Surat permohonan resmi, 2) Dokumen penerimaan dari institusi luar negeri, 3) Transkrip nilai dan ijazah, 4) Surat rekomendasi dari ustadz/kyai, 5) Surat pernyataan kesanggupan biaya, 6) Fotokopi paspor, 7) Medical check-up.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan rekomendasi santri luar negeri?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Fotokopi paspor\n2. Fotokopi KTP\n3. Surat Permohonan dari Pondok Pesantren Penerima\n4. Surat Pernyataan Penjamin Santri Luar Negeri Bermaterai Rp 10000",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi pindah sekolah santri Wajardiknas?",
-    answer:
-      "Rekomendasi pindah sekolah santri: 1) Surat permohonan dari orang tua/wali, 2) Surat keterangan dari sekolah asal, 3) Surat penerimaan dari sekolah tujuan, 4) Fotokopi rapor terakhir, 5) Surat keterangan kelakuan baik, 6) Alasan perpindahan yang jelas.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan rekomendasi pindah sekolah santri Wajardiknas?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan dari Pondok Pesantren\n2. Fotokopi Rapor PPS Terakhir",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi pindah madrasah?",
-    answer:
-      "Perpindahan madrasah memerlukan: 1) Surat permohonan dari orang tua, 2) Surat keterangan pindah dari madrasah asal, 3) Surat penerimaan madrasah tujuan, 4) Fotokopi ijazah dan SKHUN, 5) Transkrip nilai, 6) Surat keterangan berkelakuan baik, 7) Alasan perpindahan.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan rekomendasi pindah madrasah?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Surat Permohonan Rekomendasi dari Madrasah Asal (difotokopi 1 Lembar)\n2. Surat Penerimaan/ Kuota dari sekolah yang akan dituju ( difotokopi 1 Lembar)\n3. Raport Terakhir (difotokopi 1 Lembar )\n4. Hasil Rekomendasi dibuat Rangkap 2 (1 lembar untuk ybs dan 1 lembar untuk arsip)",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi izin operasional RA/Madrasah?",
-    answer:
-      "Izin operasional RA/Madrasah: 1) Surat permohonan dari yayasan, 2) Akta notaris dan NPWP, 3) Sertifikat tanah dan IMB, 4) Daftar tenaga pendidik dan kualifikasi, 5) Kurikulum dan program pembelajaran, 6) Sarana prasarana sesuai standar, 7) Rencana anggaran operasional.",
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan rekomendasi izin operasional RA/Madrasah?",
+      answer: 
+        "Datang ke PTSP Kementerian Agama Kab. Magetan dengan membawa:\n\n1. Proposal Izin Operasional Pendirian Madrasah Baru\n2. Daftar Isi\n3. Surat Pengantar Proposal Izin Operasional Pendirian Madrasah (Format PM ‐02)\n4. Formulir Izin Operasional Pendirian Madrasah (Format PM 02)\n5. Surat Pernyataan Kesanggupan Pembiayaan Penyelenggaraan Pendidikan Madrasah (Format PM‐03)\n6. Proposal Izin Operasional Pendirian Madrasah Baru: Data Umum, Organisasi Pengelola Madrasah, Pendidik dan tenaga pendidik, Sarana dan Prasaran, Penutup\n7. Fotokopi sah Akte Notaris Yayasan Berbadan Hukum\n8. Fotokopi Sah Pengesahan yayasan dari Kemenkumham\n9. Bagan dan struktur Yayasan\n10. Fotokopi sah AD/RT Yayasan\n11. SK Susunan Pengurus Yayasan\n12. Fotokopi Sah KTP pengurus Yayasan\n13. SK Pendirian Madrasah yang dibuat dari yayasan\n14. Piagam Pendirian Madrasah yang dibuat dari yayasan\n15. SK Pengurus/Pengelola Madarsah yang dibuat dari Yayasan\n16. Fotokopi Struktur Manajemen, Personalia Madrasah dan Daftar Riwayat Hidup\n17. SK Pengangkatan Guru dan Tenaga Kependidikan Madrasah dari Yayasan\n18. Surat Rekomendasi dari Kepala Kantor Kemenag Kabupaten\n19. Surat Persetujuan dari Pemerintah Setempat (RT/RW dan Camat)\n20. Surat Pernyataan Kesanggupan Pembiayaan Madrasah (Persyaratan Administrasi)\n21. Dokumen Kurikulum (Buku Rujukan Kurikulum Madrasah dari Kemenag, SKL, SI, SP, SPP, Kerangka Dasar Kurikulum, Silabus, RPP, KTSP)\n22. Rencana Pengembangan Madrasah\n23. Jumlah dan Prosentase kualifikasi PTK\n24. Dokumen Sarana dan Prasarana Madrasah\n25. Pernyataan Kelayakan/Study Kelayakan (Format PM‐04)\n22. AD/RT Calon Madrasah\n23. Tata tertib guru dan siswa\n24. Daftar Buku Koleksi Perpustakaan Madrasah\n25. Daftar koleksi Media Pembelajaran\n26. Daftar koleksi Peralatan Penunjang Administrasi Madrasah\n27. Foto Dokumentasi Kegiatan Madrasah\n28. Data Sarana dan Prasarana yang dimiliki",
   },
   {
-    category: "pendidikan",
-    question: "Bagaimana cara mengajukan permohonan rekomendasi izin/tugas belajar?",
-    answer:
-      "Rekomendasi izin tugas belajar: 1) Surat permohonan dari instansi/lembaga, 2) Surat penerimaan dari institusi pendidikan, 3) Riwayat hidup dan ijazah terakhir, 4) Surat pernyataan kesanggupan, 5) Rencana studi dan jadwal kuliah, 6) Surat rekomendasi atasan langsung.",
-  },
-]
+      category: "pendidikan",
+      question: "Bagaimana cara mengajukan permohonan rekomendasi izin/tugas belajar?",
+      answer: 
+        "Datang ke PTSP (Pelayanan Terpadu Satu Pintu) Kementerian Agama Kab. Magetan, dengan membawa:\n\n1. Fotokopi SK CPNS yang Legalisir\n2. Fotokopi Sah SK PNS yang Legalisir\n3. Fotokopi SK Kenaikan Pangkat Terakhir yang dilegalisir\n4. Fotokopi KARPEG/KPE yang dilegalisir\n5. Fotokopi Ijazah terakhir yang dilegalisir\n6. Fotokopi Kartu Mahasiswa\n7. SKP lengkap asli 2 Tahun terakhir (Rangkap 2)\n8. Surat Pernyataan tidak akan mutasi bermaterai Rp. 10.000 ( Rangkap 2)\n9. Surat Pernyataan tidak mengganggu kegiatan di tempat kerja bermaterai Rp. 10.000 (Rangkap 2)\n10. Surat Pernyataan tidak akan menuntut penyesuaian ijazah bermaterai Rp. 10.000 (Rangkap 2)\n11. Surat Rekomendasi dari atasan langsung\n12. Surat keterangan dari Perguruan Tinggi/ Kampus\n13. Surat Keterangan Akreditasi Perguruan Tinggi (A atau B)\n14. Jadwal Kuliah terbaru\n15. Surat Keterangan radius PT (jarak ke kampus dengan tempat kerja yang membuat Perguruan Tinggi)\n16. Surat Keterangan Hukuman Disiplin (dibuatkan oleh Kantor)",
+  }
+];
 
-export default function FAQ() {
-  const [activeCat, setActiveCat] = useState("all")
-  const [expanded, setExpanded] = useState(null)
-  const [searchTerm, setSearchTerm] = useState("")
+export default function FAQSejarahKemenag() {
+  const [activeCat, setActiveCat] = useState("all");
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFaq = faqData.filter((item) => {
-    const matchesCategory = activeCat === "all" || item.category === activeCat
-    const matchesSearch =
+    const byCategory = activeCat === "all" || item.category === activeCat;
+    const bySearch =
       item.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.answer.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+      item.answer.toLowerCase().includes(searchTerm.toLowerCase());
+    return byCategory && bySearch;
+  });
+
+  // small animation variants
+  const containerVariants = {
+    hidden: { opacity: 0, y: 8 },
+    show: { opacity: 1, y: 0 },
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-yellow-50 to-white">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-green-600 to-yellow-600 text-white py-20">
-        <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative max-w-6xl mx-auto px-6 text-center">
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <FaQuestionCircle className="text-6xl mx-auto mb-6 opacity-90" />
-            <h1 className="text-5xl font-bold mb-4">Frequently Asked Questions</h1>
-            <p className="text-xl opacity-90 max-w-2xl mx-auto">
-              Temukan jawaban untuk pertanyaan yang sering diajukan seputar layanan Kementerian Agama Kabupaten Magetan
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-green-500/10 via-white to-green-500/20 pt-20">
+      {/* Header (Sejarah-style colors) */}
+      <header className="relative bg-gradient-to-br from-green-700 to-green-800 text-white py-20">
+        <div className="absolute inset-0 bg-black/5 pointer-events-none"></div>
+        <div className="max-w-6xl mx-auto px-6 relative z-10 text-center">
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="inline-block mb-4 p-4 rounded-full bg-white/10">
+              <FaQuestionCircle className="text-5xl mx-auto" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-2">Frequently Asked Questions</h1>
+            <h2>Kementerian Agama Kabupaten Magetan</h2>
           </motion.div>
         </div>
+      </header>
 
-        {/* Floating Elements */}
-        <motion.div
-          className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full"
-          animate={{ y: [0, -20, 0] }}
-          transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY }}
-        />
-        <motion.div
-          className="absolute bottom-20 right-10 w-16 h-16 bg-yellow-300/20 rounded-full"
-          animate={{ y: [0, 20, 0] }}
-          transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY }}
-        />
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Search Bar */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
+      <main className="max-w-6xl mx-auto px-6 py-12">
+        {/* Search */}
+        <motion.div initial="hidden" animate="show" variants={containerVariants} className="mb-8">
           <div className="relative max-w-md mx-auto">
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-green-600" />
             <input
-              type="text"
+              type="search"
               placeholder="Cari pertanyaan..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-full focus:border-green-500 focus:outline-none transition-colors"
+              className="w-full pl-12 pr-4 py-3 border-2 border-green-100 rounded-full shadow-sm focus:border-green-500 focus:ring-1 focus:ring-green-200 outline-none"
             />
           </div>
         </motion.div>
 
-        {/* Category Tabs */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-4 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
+        {/* Categories (toggle on click: click again returns to 'all') */}
+        <motion.div initial="hidden" animate="show" variants={containerVariants} className="flex flex-wrap justify-center gap-4 mb-10">
           {categories.map((cat) => {
-            const IconComponent = cat.icon
+            const Icon = cat.icon;
+            const isActive = activeCat === cat.key;
             return (
               <motion.button
                 key={cat.key}
-                onClick={() => setActiveCat(cat.key)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white transition-all duration-300 ${cat.color} ${
-                  activeCat === cat.key
-                    ? "ring-4 ring-offset-2 ring-green-300 scale-105"
-                    : "opacity-80 hover:opacity-100 hover:scale-105"
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                onClick={() => setActiveCat(isActive ? "all" : cat.key)}
+                className={`flex items-center gap-2 px-5 py-2 rounded-full font-semibold text-white transition-all duration-200 shadow-sm
+                  ${isActive ? "scale-105 ring-4 ring-green-200" : "opacity-90 hover:opacity-100 hover:-translate-y-1"}`}
               >
-                <IconComponent className="text-sm" />
-                {cat.label}
+                <span className={`inline-flex items-center justify-center w-9 h-9 rounded-full ${cat.color} shadow-inner`}>
+                  <Icon className="w-4 h-4 text-white" />
+                </span>
+                <span className="text-sm font-medium text-green-900">{cat.label}</span>
               </motion.button>
-            )
+            );
           })}
         </motion.div>
 
         {/* FAQ List */}
         <div className="space-y-4">
           <AnimatePresence>
-            {filteredFaq.map((item, idx) => {
-              const catColor = categories.find((c) => c.key === item.category)?.color || "bg-gray-500"
-              const isOpen = expanded === idx
-              return (
-                <motion.div
-                  key={`${activeCat}-${idx}`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl border border-gray-100 overflow-hidden transition-all duration-300"
-                >
-                  <motion.button
-                    onClick={() => setExpanded(isOpen ? null : idx)}
-                    className="w-full flex justify-between items-center p-6 text-left hover:bg-gray-50 transition-colors"
-                    whileHover={{ backgroundColor: "rgba(0,0,0,0.02)" }}
-                  >
-                    <div className="flex items-start gap-4 flex-1">
-                      <span
-                        className={`text-xs text-white px-3 py-1 rounded-full font-medium ${catColor} flex-shrink-0 mt-1`}
-                      >
-                        {categories.find((c) => c.key === item.category)?.label}
-                      </span>
-                      <p className="text-gray-800 font-semibold text-lg leading-relaxed">{item.question}</p>
-                    </div>
-                    <motion.div
-                      animate={{ rotate: isOpen ? 180 : 0 }}
-                      transition={{ duration: 0.3 }}
-                      className="flex-shrink-0 ml-4"
-                    >
-                      <FaChevronDown className="text-green-600 text-xl" />
-                    </motion.div>
-                  </motion.button>
+            {filteredFaq.length > 0 ? (
+              filteredFaq.map((item, idx) => {
+                const isOpen = expandedIndex === idx;
+                const cat = categories.find((c) => c.key === item.category) || categories[0];
 
-                  <AnimatePresence>
-                    {isOpen && (
+                return (
+                  <motion.div
+                    key={`${item.question}-${idx}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.28, delay: idx * 0.03 }}
+                    className="bg-white rounded-2xl shadow-lg border border-green-100 overflow-hidden"
+                  >
+                    <button
+                      onClick={() => setExpandedIndex(isOpen ? null : idx)}
+                      className="w-full text-left p-6 flex items-start gap-4 hover:bg-green-50 transition-colors"
+                    >
+                      <span className={`text-xs text-white px-3 py-1 rounded-full font-medium ${cat.color} flex-shrink-0 mt-1`}>
+                        {cat.label}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-gray-800 font-semibold text-lg leading-tight">{item.question}</p>
+                        {/* subtitle area left intentionally for clarity */}
+                      </div>
+
                       <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: "easeInOut" }}
-                        className="overflow-hidden"
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.28 }}
+                        className="flex-shrink-0 ml-4 text-green-700"
                       >
-                        <div className="px-6 pb-6 pt-2">
-                          <div className="bg-gradient-to-r from-green-50 to-yellow-50 rounded-xl p-6 border-l-4 border-green-500">
-                            <p className="text-gray-700 leading-relaxed text-base">{item.answer}</p>
-                          </div>
-                        </div>
+                        <FaChevronDown />
                       </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )
-            })}
+                    </button>
+
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.36, ease: "easeInOut" }}
+                        >
+                          <div className="px-6 pb-6 pt-2">
+                            <div className="bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl p-5 border-l-4 border-emerald-700">
+                              <div className="text-gray-700 leading-relaxed text-base space-y-2">
+                                {item.answer.split("\n").map((line, index) => {
+                                  if (/^\d+\.\s/.test(line)) {
+                                    return (
+                                      <div key={index} className="flex">
+                                        <span className="font-semibold mr-2">{line.match(/^\d+\./)[0]}</span>
+                                        <span className="flex-1">{line.replace(/^\d+\.\s/, "")}</span>
+                                      </div>
+                                    );
+                                  }
+                                  return <p key={index}>{line}</p>;
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
+                <FaQuestionCircle className="text-6xl text-gray-300 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 mb-2">Tidak ada pertanyaan yang ditemukan</h3>
+                <p className="text-gray-500">Coba ubah kata kunci pencarian atau pilih kategori lain.</p>
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
-
-        {/* No Results */}
-        {filteredFaq.length === 0 && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-            <FaQuestionCircle className="text-6xl text-gray-300 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">Tidak ada pertanyaan yang ditemukan</h3>
-            <p className="text-gray-500">Coba ubah kata kunci pencarian atau pilih kategori lain</p>
-          </motion.div>
-        )}
-
-        {/* Contact Section */}
-        <motion.div
-          className="mt-16 bg-gradient-to-r from-green-600 to-yellow-600 rounded-2xl p-8 text-white text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
-          <h3 className="text-2xl font-bold mb-4">Tidak menemukan jawaban yang Anda cari?</h3>
-          <p className="text-lg opacity-90 mb-6">Hubungi kami langsung untuk mendapatkan bantuan lebih lanjut</p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <motion.a
-              href="tel:+62351462324"
-              className="bg-white text-green-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              📞 (0351) 462324
-            </motion.a>
-            <motion.a
-              href="mailto:kemenagmagetan@gmail.com"
-              className="bg-white text-green-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              ✉️ Email Kami
-            </motion.a>
-          </div>
-        </motion.div>
-      </div>
+      </main>
     </div>
-  )
+  );
 }
