@@ -40,7 +40,7 @@ const HeroSection = () => {
       <div
         className="absolute inset-0 bg-[url('/assets/images/bambuu.png')] 
                    bg-repeat bg-center opacity-10 pointer-events-none"
-        style={{ backgroundSize: "300px auto" }}
+        style={{ backgroundSize: "400px auto" }}
       ></div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -105,12 +105,14 @@ const HeroSection = () => {
               transition={{ duration: 0.7, delay: 1 }}
               className="mt-6"
             >
-              <a
-                href="#layanan"
-                className="inline-block px-6 py-3 rounded-full bg-yellow-300 text-green-900 font-semibold shadow-lg hover:bg-yellow-400 transition"
-              >
-                Lihat Layanan Kami
-              </a>
+            <a
+              href="https://wa.me/6281234567890"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block px-6 py-3 rounded-full bg-yellow-300 text-green-900 font-semibold shadow-lg hover:bg-yellow-400 transition"
+            >
+              Hubungi Kami
+            </a>
             </motion.div>
           </motion.div>
 

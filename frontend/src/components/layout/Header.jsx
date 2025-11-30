@@ -321,7 +321,6 @@ const Header = () => {
       name: "Layanan",
       path: "/layanan",
       submenu: [
-        { name: "Standar Pelayanan", path: "/layanan/standar-pelayanan" },
         { name: "SOP (Standar Operasional Prosedur)", path: "/layanan/sop" },
         { name: "SPM (Standar Pelayanan Minimal)", path: "/layanan/spm" },
       ],

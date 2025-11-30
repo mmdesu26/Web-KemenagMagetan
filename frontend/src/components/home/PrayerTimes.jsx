@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaMosque, FaClock, FaSun, FaMoon, FaCalendarAlt } from "react-icons/fa";
+import { FaMosque, FaClock, FaCalendarAlt } from "react-icons/fa";
 import { apiClient } from "../../api/client";
+import { FaMoon, FaSun } from "react-icons/fa";
 
-const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
+const PrayerTimes = ({ currentDate = new Date() }) => {
 	const [prayerTimes, setPrayerTimes] = useState({
 		subuh: "04:30",
 		dzuhur: "12:00",
@@ -11,22 +12,21 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 		maghrib: "18:00",
 		isya: "19:15",
 	});
+
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
-
 	const [currentPrayer, setCurrentPrayer] = useState("");
 	const [nextPrayer, setNextPrayer] = useState("");
 	const [timeLeft, setTimeLeft] = useState("");
 	const [currentTime, setCurrentTime] = useState(new Date());
 
-
-	// Prayer icons mapping
+	// Icons
 	const prayerIcons = {
-		subuh: <FaMoon className="text-slate-600" />,
-		dzuhur: <FaSun className="text-amber-600" />,
-		ashar: <FaSun className="text-orange-600" />,
-		maghrib: <FaSun className="text-red-600" />,
-		isya: <FaMoon className="text-indigo-600" />
+		subuh: <FaMoon className="text-slate-600 text-lg sm:text-xl" />,
+		dzuhur: <FaSun className="text-amber-600 text-lg sm:text-xl" />,
+		ashar: <FaSun className="text-orange-600 text-lg sm:text-xl" />,
+		maghrib: <FaSun className="text-red-600 text-lg sm:text-xl" />,
+		isya: <FaMoon className="text-indigo-600 text-lg sm:text-xl" />,
 	};
 
 	const prayerColors = {
@@ -34,9 +34,10 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 		dzuhur: "from-amber-500 to-amber-600",
 		ashar: "from-orange-500 to-orange-600",
 		maghrib: "from-red-500 to-red-600",
-		isya: "from-indigo-500 to-indigo-600"
+		isya: "from-indigo-500 to-indigo-600",
 	};
 
+	// Load API
 	useEffect(() => {
 		const loadPrayerTimes = async () => {
 			try {
@@ -44,6 +45,7 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 				setError("");
 				const date = currentDate.toISOString().split("T")[0];
 				const data = await apiClient.get("/public/prayer-times", { date });
+
 				if (data) {
 					setPrayerTimes({
 						subuh: (data.subuh || "04:30:00").slice(0, 5),
@@ -54,7 +56,7 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 					});
 				}
 			} catch (err) {
-				setError(err.message || "Gagal memuat jadwal sholat");
+				setError("Gagal memuat jadwal sholat");
 			} finally {
 				setLoading(false);
 			}
@@ -62,254 +64,174 @@ const PrayerTimes = ({ currentDate = new Date(), isMobile = false }) => {
 		loadPrayerTimes();
 	}, [currentDate]);
 
+	// Update waktu real-time
 	useEffect(() => {
-		updateCurrentPrayer();
-
 		const interval = setInterval(() => {
 			setCurrentTime(new Date());
 			updateCurrentPrayer();
 		}, 1000);
 
 		return () => clearInterval(interval);
-	}, [currentDate, prayerTimes]);
-
-
+	}, [prayerTimes]);
 
 	const updateCurrentPrayer = () => {
 		const now = new Date();
-		const hours = now.getHours();
-		const minutes = now.getMinutes();
-		const currentTimeMinutes = hours * 60 + minutes;
+		const minutesNow = now.getHours() * 60 + now.getMinutes();
 
-		const prayers = [
+		const arr = [
 			{ name: "Subuh", time: prayerTimes.subuh },
 			{ name: "Dzuhur", time: prayerTimes.dzuhur },
 			{ name: "Ashar", time: prayerTimes.ashar },
 			{ name: "Maghrib", time: prayerTimes.maghrib },
 			{ name: "Isya", time: prayerTimes.isya },
-		];
-
-		const prayerMinutes = prayers.map((prayer) => {
-			const [h, m] = prayer.time.split(":").map(Number);
-			return {
-				name: prayer.name,
-				minutes: h * 60 + m,
-			};
+		].map((p) => {
+			const [h, m] = p.time.split(":").map(Number);
+			return { name: p.name, minutes: h * 60 + m };
 		});
 
-		let current = "";
+		let cur = "";
 		let next = "";
 		let nextTime = 0;
 
-		for (let i = 0; i < prayerMinutes.length; i++) {
-			if (currentTimeMinutes >= prayerMinutes[i].minutes) {
-				current = prayerMinutes[i].name;
-				next = i === prayerMinutes.length - 1 
-					? prayerMinutes[0].name 
-					: prayerMinutes[i + 1].name;
-				nextTime = i === prayerMinutes.length - 1 
-					? prayerMinutes[0].minutes + 24 * 60 
-					: prayerMinutes[i + 1].minutes;
+		for (let i = 0; i < arr.length; i++) {
+			if (minutesNow >= arr[i].minutes) {
+				cur = arr[i].name;
+				next = arr[(i + 1) % arr.length].name;
+				nextTime = arr[(i + 1) % arr.length].minutes + (i === arr.length - 1 ? 1440 : 0);
 			}
 		}
 
-		if (!current) {
-			current = "";
-			next = prayerMinutes[0].name;
-			nextTime = prayerMinutes[0].minutes;
+		if (!cur) {
+			cur = "";
+			next = arr[0].name;
+			nextTime = arr[0].minutes;
 		}
 
-		const timeDiff = nextTime - currentTimeMinutes;
-		const hoursLeft = Math.floor(Math.abs(timeDiff) / 60);
-		const minutesLeft = Math.abs(timeDiff) % 60;
-		const secondsLeft = 60 - now.getSeconds();
+		const sisa = nextTime - minutesNow;
+		const jam = Math.floor(sisa / 60);
+		const menit = sisa % 60;
+		const detik = 60 - now.getSeconds();
 
-		setCurrentPrayer(current);
+		setCurrentPrayer(cur);
 		setNextPrayer(next);
-		setTimeLeft(
-			`${hoursLeft > 0 ? hoursLeft + "j " : ""}${minutesLeft}m ${secondsLeft}d`
-		);
-	};
-
-	const formatTime = (time24) => {
-		const [hours, minutes] = time24.split(':');
-		const hour12 = parseInt(hours) % 12 || 12;
-		const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
-		return `${hour12}:${minutes} ${ampm}`;
+		setTimeLeft(`${jam > 0 ? jam + "j " : ""}${menit}m ${detik}d`);
 	};
 
 	const getCurrentTimeString = () => {
-		return currentTime.toLocaleTimeString('id-ID', {
-			hour: '2-digit',
-			minute: '2-digit',
-			second: '2-digit'
+		return currentTime.toLocaleTimeString("id-ID", {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
 		});
-	};
-
-	const containerVariants = {
-		hidden: { opacity: 0, scale: 0.9 },
-		visible: { 
-			opacity: 1, 
-			scale: 1,
-			transition: {
-				duration: 0.6,
-				ease: "easeOut",
-				staggerChildren: 0.1
-			}
-		}
-	};
-
-	const itemVariants = {
-		hidden: { opacity: 0, y: 20 },
-		visible: { opacity: 1, y: 0 }
-	};
-
-	const pulseAnimation = {
-		scale: [1, 1.05, 1],
-		transition: { duration: 2, repeat: Infinity, ease: "easeInOut" }
 	};
 
 	return (
 		<motion.div
-			variants={containerVariants}
-			initial="hidden"
-			animate="visible"
-			className="rounded-lg border border-gray-200 p-4 bg-white"
+			initial={{ opacity: 0, scale: 0.95 }}
+			animate={{ opacity: 1, scale: 1 }}
+			className="rounded-xl border border-gray-200 p-4 bg-white shadow-sm w-full max-w-full"
 		>
-
-
 			{/* Header */}
-			<motion.div 
-				variants={itemVariants}
-				className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4"
-			>
-				<div className="flex items-center mb-2 sm:mb-0">
-					<div className="w-8 h-8 rounded bg-emerald-600 flex items-center justify-center mr-3">
-						<FaMosque className="text-white text-sm" />
+			<div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-3">
+				<div className="flex items-center gap-3">
+					<div className="w-9 h-9 bg-emerald-600 rounded flex items-center justify-center">
+						<FaMosque className="text-white" />
 					</div>
 					<div>
-						<h2 className="text-lg font-bold text-green-900">
-							{!isMobile && "Jadwal "}Sholat
-						</h2>
-						<p className="text-sm text-gray-500">Magetan, Jawa Timur</p>
+						<h2 className="text-lg sm:text-xl font-bold text-green-900">Jadwal Sholat</h2>
+						<p className="text-xs text-gray-500">Magetan, Jawa Timur</p>
 					</div>
 				</div>
-				
+
 				<div className="text-right">
-					<div className="flex items-center text-xs text-gray-500 mb-1">
-						<FaCalendarAlt className="mr-1" />
+					<div className="text-xs text-gray-500 flex items-center justify-end gap-1">
+						<FaCalendarAlt />
 						{currentDate.toLocaleDateString("id-ID", {
-							weekday: isMobile ? "short" : "long",
+							weekday: "long",
 							day: "numeric",
-							month: isMobile ? "short" : "long",
+							month: "long",
 							year: "numeric",
 						})}
 					</div>
-					<div className="text-sm font-bold text-gray-700">
-						{getCurrentTimeString()}
-					</div>
+					<div className="font-bold text-gray-700 text-sm">{getCurrentTimeString()}</div>
 				</div>
-			</motion.div>
+			</div>
 
-			{loading && (
-				<div className="text-center text-gray-500 py-2">Memuat jadwal...</div>
-			)}
-
-			{error && !loading && (
-				<div className="text-center text-red-500 py-2">{error}</div>
-			)}
-
-			{/* Current Prayer Status */}
-			<AnimatePresence mode="wait">
+			{/* Status Current */}
+			<AnimatePresence>
 				{currentPrayer && (
 					<motion.div
-						key="current"
-						initial={{ opacity: 0, x: -50 }}
+						initial={{ opacity: 0, x: -20 }}
 						animate={{ opacity: 1, x: 0 }}
-						exit={{ opacity: 0, x: 50 }}
-						className="mb-3 p-3 rounded bg-emerald-50 border border-emerald-200"
+						exit={{ opacity: 0, x: 20 }}
+						className="mb-4 p-3 rounded-lg bg-emerald-50 border border-emerald-200"
 					>
-						<div>
-							<div className="text-xs text-emerald-700 mb-1">Sedang berlangsung:</div>
-							<div className="font-bold text-emerald-900 flex items-center">
-								{prayerIcons[currentPrayer.toLowerCase()]}
-								<span className="ml-2">{currentPrayer}</span>
-							</div>
+						<div className="text-xs text-emerald-700">Sedang berlangsung:</div>
+						<div className="font-bold text-emerald-900 flex items-center gap-2 mt-1">
+							{prayerIcons[currentPrayer.toLowerCase()]}
+							{currentPrayer}
 						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
 
-			{/* Next Prayer Countdown */}
+			{/* Next Prayer */}
 			{nextPrayer && (
-				<motion.div
-					variants={itemVariants}
-					className="mb-3 p-3 rounded bg-amber-50 border border-amber-200"
-				>
-					<div className="flex items-center justify-between">
+				<div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200">
+					<div className="flex justify-between items-center">
 						<div>
-							<div className="text-xs text-amber-700 mb-1">Sholat berikutnya:</div>
-							<div className="font-bold text-amber-900 flex items-center">
+							<div className="text-xs text-amber-700">Sholat berikutnya:</div>
+							<div className="font-bold text-amber-900 flex items-center gap-2 mt-1">
 								{prayerIcons[nextPrayer.toLowerCase()]}
-								<span className="ml-2">{nextPrayer}</span>
+								{nextPrayer}
 							</div>
 						</div>
 						<div className="text-right">
-							<div className="text-xs text-amber-600 mb-1">Sisa waktu:</div>
-							<div className="font-bold text-sm text-amber-800 flex items-center">
-								<FaClock className="mr-1" />
+							<div className="text-xs text-amber-700">Sisa waktu:</div>
+							<div className="font-bold text-amber-800 flex items-center gap-1 text-sm">
+								<FaClock />
 								{timeLeft}
 							</div>
 						</div>
 					</div>
-				</motion.div>
+				</div>
 			)}
 
-			{/* Prayer Times Grid */}
-			<div className={`grid ${
-					isMobile ? "grid-cols-2" : "grid-cols-5"
-				} gap-2 mb-3`}>
-				{Object.entries(prayerTimes).map(([name, time], index) => {
+			{/* Grid Jadwal – SUPER RESPONSIF */}
+			<div className="
+				grid 
+				grid-cols-2 
+				sm:grid-cols-3 
+				md:grid-cols-5 
+				gap-2 
+				w-full
+			">
+				{Object.entries(prayerTimes).map(([name, time]) => {
 					const prayerName = name.charAt(0).toUpperCase() + name.slice(1);
 					const isActive = currentPrayer === prayerName;
 					const isNext = nextPrayer === prayerName;
-					
-					return (
-					<div
-						key={name}
-						className={`p-3 rounded border transition-colors ${
-							isActive
-								? `bg-gradient-to-br ${prayerColors[name]} text-white`
-								: isNext
-								? 'bg-amber-50 border-amber-300'
-								: 'bg-gray-50 border-gray-200'
-						}`}
-					>
-						{/* Next prayer indicator */}
-						{isNext && !isActive && (
-							<div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-400 rounded-full" />
-						)}
 
-						<div className="text-center">
-							<div className="mb-2">
-								{prayerIcons[name]}
-							</div>
-							
-							<div className="font-medium text-sm mb-1">
-								{prayerName}
-							</div>
-							
-							<div className="text-sm font-bold">
-								{time}
-							</div>
+					return (
+						<div
+							key={name}
+							className={`relative p-3 rounded-lg border text-center transition-all duration-200
+								${isActive
+									? `bg-gradient-to-br ${prayerColors[name]} text-white`
+									: isNext
+									? "bg-amber-50 border-amber-300"
+									: "bg-gray-50 border-gray-200"
+								}`}
+						>
+
+							<div className="flex justify-center mb-2">{prayerIcons[name]}</div>
+							<div className="font-medium text-sm sm:text-base">{prayerName}</div>
+							<div className="font-bold text-sm sm:text-lg mt-1">{time}</div>
 						</div>
-					</div>
 					);
 				})}
 			</div>
 
-			{/* Footer */}
-			<div className="text-center pt-3 border-t border-gray-200">
+			<div className="text-center mt-4 pt-3 border-t border-gray-200">
 				<p className="text-xs text-gray-500">
 					Jadwal waktu sholat berdasarkan koordinat Kabupaten Magetan
 				</p>

@@ -62,7 +62,6 @@ import FAQ from "./pages/FAQ/page.jsx";
 // ✅ LAYANAN
 import SOP from "./components/Layanan/SOP/page.jsx";
 import SPM from "./components/Layanan/SPM/page.jsx";
-import StandarPelayanan from "./components/Layanan/StandarPelayanan/page.jsx";
 
 // ✅ PTSP
 import TugasPtsp from './components/PTSP/TugasPtsp/page.jsx'; 
@@ -96,7 +95,6 @@ function AnimatedRoutes() {
         <Route path="/berita" element={<BeritaPage />} />
 
         {/* LAYANAN */}
-        <Route path="/Layanan/standar" element={<StandarPelayanan />} />
         <Route path="/Layanan/SOP" element={<SOP />} />
         <Route path="/Layanan/SPM" element={<SPM />} />
 
